@@ -1,0 +1,18 @@
+$BaseAddress = "https://accounts.spotify.com/api/token"
+$Method = "Post"
+$ClientId = ""
+$ClientSecret = ""
+$CombinedCodes = [System.Text.Encoding]::UTF8.GetBytes($ClientId + ":" + $ClientSecret)
+$ConvertedIdSecret = [System.Convert]::ToBase64String($CombinedCodes)
+
+$Body = @{
+    "grant_type" = "client_credentials"
+}
+
+$Auth = @{
+    "Authorization" = "Basic " + $ConvertedIdSecret
+}
+
+$Response = Invoke-WebRequest -Method $Method -Headers $Auth -Body $Body -Uri $BaseAddress
+
+$TokenInfo = $Response.Content
