@@ -20,32 +20,32 @@ function  New-SpotifyCredential {
         $ClientSecret
     )
 
-    $CredentialStore = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
+    $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
 
     <# We don't want to destroy any existing credential files, proceeding with caution. #>
     $Overwrite = "n"
 
-    if (!(Test-Path -Path $CredentialStore)) {
+    if (!(Test-Path -Path $CredentialStorePath)) {
 
         <# 1. There is no credential repo, let's try to make one. #>
         try {
-            Write-Verbose "Attempting to create credential store at $CredentialStore"
-            New-Item -Path $CredentialStore -ItemType Directory -ErrorAction Stop
-            Write-Verbose "Successfully created credential store at $CredentialStore"
+            Write-Verbose "Attempting to create credential store at $CredentialStorePath"
+            New-Item -Path $CredentialStorePath -ItemType Directory -ErrorAction Stop
+            Write-Verbose "Successfully created credential store at $CredentialStorePath"
         } catch {
-            Write-Warning "Failed attempting to create credential store at $CredentialStore"
+            Write-Warning "Failed attempting to create credential store at $CredentialStorePath"
             Write-Warning "Check error for more details."
             break
         }
 
     }
 
-    Write-Verbose "Credential store exists at $CredentialStore"
+    Write-Verbose "Credential store exists at $CredentialStorePath"
 
     <# Construct filepath #>
-    $CredentialPath = $CredentialStore + $Name + ".json"
+    $CredentialFilePath = $CredentialStorePath + $Name + ".json"
 
-    $ExistingCredential = Get-Item -Path $CredentialPath -ErrorAction SilentlyContinue
+    $ExistingCredential = Get-Item -Path $CredentialFilePath -ErrorAction SilentlyContinue
 
     if ($ExistingCredential) {
         $Overwrite = Read-Host -Prompt "Found existing credential with name $Name, do you want to overwrite it? (y/n)"
@@ -66,17 +66,16 @@ function  New-SpotifyCredential {
 
         <# Try to save credential to file. #>
         try {
-            Write-Verbose "Attempting to save credentials to $CredentialPath"
-            $CredentialJSON | Out-File -FilePath $CredentialPath
-            Write-Verbose "Successfully saved credentials to $CredentialPath"
+            Write-Verbose "Attempting to save credentials to $CredentialFilePath"
+            $CredentialJSON | Out-File -FilePath $CredentialFilePath
+            Write-Verbose "Successfully saved credentials to $CredentialFilePath"
         } catch {
-            Write-Warning "Failed saving credentials to $CredentialPath"
+            Write-Warning "Failed saving credentials to $CredentialFilePath"
         }
     } else {
         Write-Verbose "No work to do."
     }
 }
-
 
 <# This is for testing #>
 # New-SpotifyCredential -Name "Test2" -ClientId "blahahID" -ClientSecret "blahblahSECRET" -Verbose
