@@ -1,5 +1,4 @@
-﻿<# Write a function to save spotify secrets in a local location #>
-function  New-SpotifyCredential {
+﻿function  New-SpotifyCredential {
     param (
         <# Credential name so user can identify it #>
         # Parameter help description
@@ -76,6 +75,3 @@ function  New-SpotifyCredential {
         Write-Verbose "No work to do."
     }
 }
-
-<# This is for testing #>
-# New-SpotifyCredential -Name "Test2" -ClientId "blahahID" -ClientSecret "blahblahSECRET" -Verbose
