@@ -4,7 +4,7 @@ function Send-SpotifyCall {
 
         # Name of spotify credential to use
         [Parameter(Mandatory = $true)]
-        [ParameterType]
+        [String]
         $CredentialName,
 
         # This is our method

@@ -9,8 +9,8 @@ function Get-SpotifyAccessToken {
 
     $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
     $AccessTokenStorePath = $SpotishellStore + "access_token\"
-    $CredentialStorePath = $SpotishellStore + "credential\"
     $AccessTokenFilePath = $AccessTokenStorePath + $Name + ".json"
+    $CredentialStorePath = $SpotishellStore + "credential\"
     $CredentialFilePath = $CredentialStorePath + $Name + ".json"
 
     <# Check if we have a valid access token already #>
@@ -45,21 +45,34 @@ function Get-SpotifyAccessToken {
         }
     }
 
+    try {
+        $SpotifyCredentials = Get-SpotifyCredential -Name $Name -ErrorAction Stop
+    } catch {
+        Write-Warning "Couldn't find spotify credentials with name $Name"
+        break
+    }
     <# The request is sent to the /api/token endpoint of the Accounts service:
-        POST https://accounts.spotify.com/api/token #>
+    POST https://accounts.spotify.com/api/token #>
     $Uri = "https://accounts.spotify.com/api/token"
     $Method = "Post"
 
     <# The body of this POST request must contain the following parameters encoded
-        in application/x-www-form-urlencoded as defined in the OAuth 2.0 specification #>
+    in application/x-www-form-urlencoded as defined in the OAuth 2.0 specification #>
     $Body = @{
         "grant_type" = "client_credentials"
+    }
+
+    <# Base 64 encoded string that contains the client ID and client secret key. #>
+    $CombinedCredentials = [System.Text.Encoding]::UTF8.GetBytes($SpotifyCredentials.ClientId + ":" + $SpotifyCredentials.ClientSecret)
+    $Base64Credentials = [System.Convert]::ToBase64String($CombinedCredentials)
+    $Auth = @{
+        "Authorization" = "Basic " + $Base64Credentials
     }
 
     <# Call api for auth token #>
     try {
         Write-Verbose "Attempting to send request to API"
-        Send-SpotifyCall -CredentialName $Name -Uri $Uri -Method $Method -Body $Body
+        $Response = Invoke-WebRequest -Uri $Uri -Method $Method -Body $Body -Headers $Auth
         $CurrentTime = Get-Date
     } catch {
         Write-Warning "Failed sending request to API"
@@ -80,7 +93,8 @@ function Get-SpotifyAccessToken {
                 }
                 $AccessTokenJSON | ConvertTo-Json -Depth 100 | Out-File -FilePath $AccessTokenFilePath
                 Write-Verbose "Successfully saved access token to $AccessTokenFilePath"
-                return $Response.Content."access_token"
+                $AccessTokenObject = Get-Content $AccessTokenFilePath | ConvertFrom-Json -ErrorAction Stop
+                return $AccessTokenObject
             } catch {
                 Write-Warning "Failed saving access token to $AccessTokenFilePath"
             }
@@ -95,6 +109,3 @@ function Get-SpotifyAccessToken {
         break
     }
 }
-
-<# This is for testing #>
-#Get-SpotifyAccessToken -Name "dev" -Verbose

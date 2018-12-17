@@ -68,6 +68,7 @@
             Write-Verbose "Attempting to save credentials to $CredentialFilePath"
             $CredentialJSON | Out-File -FilePath $CredentialFilePath
             Write-Verbose "Successfully saved credentials to $CredentialFilePath"
+
         } catch {
             Write-Warning "Failed saving credentials to $CredentialFilePath"
         }
