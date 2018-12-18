@@ -38,6 +38,11 @@ function Search-Spotify {
         $Filters += "track"
     } elseif ($Playlist) {
         $Filters += "playlist"
+    } else {
+        $Filters += "artist"
+        $Filters += "album"
+        $Filters += "track"
+        $Filters += "playlist"
     }
 
     # If we have anything to filter by, we need to add this to our query first.

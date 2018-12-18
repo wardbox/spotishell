@@ -2,3 +2,5 @@
 \.vscode/
 
 dev/publish-psgallery\.ps1
+
+dev/CombinedFunctions/Combined\.ps1

@@ -1,17 +1,18 @@
-. .\dev\CombinedFunctions\Combined.ps1
+#Get public and private function definition files.
+$Public = @( Get-ChildItem -Path Spotishell\Public\*.ps1 -ErrorAction SilentlyContinue )
+$Private = @( Get-ChildItem -Path Spotishell\Private\*.ps1 -ErrorAction SilentlyContinue )
 
-New-SpotifyCredential -Name "blah"
-Set-SpotifyCredential -Name "dev" -Verbose
-Remove-SpotifyCredential -Name "blah" -Verbose
+#Dot source the files
+Foreach ($import in @($Public + $Private)) {
+    Try {
+        . $import.fullname
+    } Catch {
+        Write-Error -Message "Failed to import function $($import.fullname): $_"
+    }
+}
+
 
 #find an artist
 $Artist = "Adam Tell"
-$ArtistObject = Search-Spotify -Query $Artist -Artist
-
-#find a song by that artist
-$Song = "Foreground"
-
-#find an album by that artist
-$Album = "Recomposure"
-
-#find song length of song by that artist
+$ArtistObject = Search-Spotify -Query $Artist
+Write-Output $ArtistObject
