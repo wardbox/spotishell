@@ -1,9 +1,12 @@
 . .\dev\CombinedFunctions\Combined.ps1
 
-$AccessToken = Get-SpotifyAccessToken -Name "dev"
+New-SpotifyCredential -Name "blah"
+Set-SpotifyCredential -Name "dev" -Verbose
+Remove-SpotifyCredential -Name "blah" -Verbose
 
 #find an artist
 $Artist = "Adam Tell"
+$ArtistObject = Search-Spotify -Query $Artist -Artist
 
 #find a song by that artist
 $Song = "Foreground"

@@ -11,7 +11,7 @@ function Get-SpotifyAccessToken {
     $AccessTokenStorePath = $SpotishellStore + "access_token\"
     $AccessTokenFilePath = $AccessTokenStorePath + $Name + ".json"
     $CredentialStorePath = $SpotishellStore + "credential\"
-    $CredentialFilePath = $CredentialStorePath + $Name + ".json"
+    #$CredentialFilePath = $CredentialStorePath + $Name + ".json"
 
     <# Check if we have a valid access token already #>
     if (!(Test-Path -Path $AccessTokenStorePath)) {
@@ -77,11 +77,11 @@ function Get-SpotifyAccessToken {
 
     <# Call api for auth token #>
     try {
-        Write-Verbose "Attempting to send request to API"
+        Write-Verbose "Attempting to send request to API to get access token."
         $Response = Invoke-WebRequest -Uri $Uri -Method $Method -Body $Body -Headers $Auth
         $CurrentTime = Get-Date
     } catch {
-        Write-Warning "Failed sending request to API"
+        Write-Warning "Failed sending request to API to get access token."
         break
     }
 
@@ -124,11 +124,6 @@ function Send-SpotifyCall {
     [CmdletBinding()]
     param (
 
-        # Name of spotify credential to use
-        [Parameter(Mandatory = $true)]
-        [String]
-        $CredentialName,
-
         # This is our method
         [Parameter(Mandatory = $true)]
         [string]
@@ -150,41 +145,43 @@ function Send-SpotifyCall {
         $Body
     )
 
-    $AccessToken = Get-SpotifyAccessToken -Name $CredentialName
+    $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
+    $CredentialStorePath = $SpotishellStore + "credential\"
+    $CredentialName = Get-Content -Path ($CredentialStorePath + "current.txt")
 
-    if (!($Header)) {
-        $Header = @{
-            "Authorization" = "Basic " + $AccessToken.access_token
+    if ($CredentialName) {
+
+        $AccessToken = Get-SpotifyAccessToken -Name $CredentialName
+
+        if (!($Header)) {
+            $Header = @{
+                "Authorization" = "Bearer " + $AccessToken.access_token
+            }
         }
-    }
 
-    if (!($Body)) {
-        <# The body of this POST request must contain the following parameters encoded
-        in application/x-www-form-urlencoded as defined in the OAuth 2.0 specification #>
-        $Body = @{
-            "grant_type" = "client_credentials"
+        <# Call api for auth token #>
+        try {
+            Write-Verbose "Attempting to send request to API"
+            if ($Body) {
+                $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
+            } else {
+                $Response = Invoke-WebRequest -Method $Method -Headers $Header -Uri $Uri
+            }
+        } catch {
+            Write-Warning "Failed sending request to API"
+            break
         }
-    }
 
-    <# Call api for auth token #>
-    try {
-        Write-Verbose "Attempting to send request to API"
-        if ($Body) {
-            $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
+        if ($Response) {
+            Write-Verbose "We got a response!"
+            $Response = $Response.Content | ConvertFrom-Json
+            return $Response
         } else {
-            $Response = Invoke-WebRequest -Method $Method -Headers $Header -Uri $Uri
+            Write-Warning "No response!"
+            break
         }
-    } catch {
-        Write-Warning "Failed sending request to API"
-        break
-    }
-
-    if ($Response) {
-        Write-Verbose "We got a response!"
-        $Response = $Response.Content | ConvertFrom-Json
-        return $Response
     } else {
-        Write-Warning "No response!"
+        Write-Warning "No current credential found. Either do New-SpotifyCredential or Set-SpotifyCredential first."
         break
     }
 }
@@ -284,12 +281,19 @@ function  New-SpotifyCredential {
     $CredentialJSON = $CredentialJSON | ConvertTo-Json -Depth 100
 
     if ($Overwrite -like "y*") {
-
         <# Try to save credential to file. #>
         try {
             Write-Verbose "Attempting to save credentials to $CredentialFilePath"
             $CredentialJSON | Out-File -FilePath $CredentialFilePath
             Write-Verbose "Successfully saved credentials to $CredentialFilePath"
+            if (Get-Item -Path ($CredentialStorePath + "current.txt")) {
+                $CurrentOverwrite = Read-Host "There's a current.txt with a different credential, want to overwrite it with $Name?(y/n)"
+                if ($CurrentOverwrite -like "y*") {
+                    Set-SpotifyCredential -Name $Name
+                }
+            } else {
+                Set-SpotifyCredential -Name $Name
+            }
             $CredentialObject = Get-Content $CredentialFilePath | ConvertFrom-Json -ErrorAction Stop
             return $CredentialObject
         } catch {
@@ -297,5 +301,165 @@ function  New-SpotifyCredential {
         }
     } else {
         Write-Verbose "No work to do."
+    }
+}
+
+function Search-Spotify {
+    param (
+        # The data we want to look for
+        [Parameter(Mandatory = $true)]
+        $Query,
+
+        # Artist switch
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $Artist,
+
+        # Album switch
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $Album,
+
+        # Track switch
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $Track,
+
+        # Playlist switch
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $Playlist
+
+    )
+
+    $Query = "q=" + $Query.replace(" ", "+")
+
+    $Filters = @()
+
+    if ($Artist) {
+        $Filters += "artist"
+    } elseif ($Album) {
+        $Filters += "album"
+    } elseif ($Track) {
+        $Filters += "track"
+    } elseif ($Playlist) {
+        $Filters += "playlist"
+    }
+
+    # If we have anything to filter by, we need to add this to our query first.
+    if ($Filters) {
+        Write-Verbose "We've got some filters, let's load up our query."
+        $Query += "&type="
+        $Count = $Filters.Count
+
+        foreach ($Record in $Filters) {
+            if ($Count -gt 1) {
+                $Query += "$Record,"
+            } else {
+                $Query += $Record
+            }
+            Write-Verbose "Current query: $Query"
+            # Decrement so we can see if we need to add a comma at the end or not, kinda dumb but easy enough
+            $Count--
+        }
+    }
+
+    $Method = "Get"
+    $Uri = "https://api.spotify.com/v1/search" + "?" + $Query
+
+    $Response = Send-SpotifyCall -Method $Method -Uri $Uri
+    return $Response
+
+}
+
+function Set-SpotifyCredential {
+    param(
+        # Name of our credential we've created
+        [Parameter(Mandatory = $true)]
+        [string]
+        $Name
+    )
+
+    $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
+
+    # If we don't have a credential store, tell user to make one
+    if (!(Test-Path -Path $CredentialStorePath)) {
+        Write-Warning "Failed attempting to create credential store at $CredentialStorePath"
+        Write-Warning "Suggest running New-SpotifyCredential to create a credential first."
+        break
+    }
+
+    Write-Verbose "Credential store exists at $CredentialStorePath"
+
+    <# Construct filepath #>
+    $CredentialFilePath = $CredentialStorePath + $Name + ".json"
+
+    $ExistingCredential = Get-Item -Path $CredentialFilePath -ErrorAction SilentlyContinue
+
+    if ($ExistingCredential) {
+        $CurrentCredential = Get-Content -Path ($CredentialStorePath + "current.txt")
+        if ($CurrentCredential -ne $Name) {
+            try {
+                Write-Verbose "Attempting to save current.txt with $Name credentials"
+                "$Name" | New-Item -Path ($CredentialStorePath + "current.txt") -Force
+                Write-Verbose "Success"
+            } catch {
+                Write-Warning "Unable to create current.txt with $Name credentials."
+                break
+            }
+        } else {
+            Write-Verbose "$Name is already set as the current credential."
+        }
+    } else {
+        Write-Warning "There's no existing credential with name $Name"
+    }
+}
+
+function Remove-SpotifyCredential {
+    param(
+        # Name of our credential we've created
+        [Parameter(Mandatory = $true)]
+        [string]
+        $Name
+    )
+
+    $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
+
+    # If we don't have a credential store, tell user to make one
+    if (!(Test-Path -Path $CredentialStorePath)) {
+        Write-Warning "Failed attempting to create credential store at $CredentialStorePath"
+        Write-Warning "Suggest running New-SpotifyCredential to create a credential first."
+        break
+    }
+
+    Write-Verbose "Credential store exists at $CredentialStorePath"
+
+    <# Construct filepath #>
+    $CredentialFilePath = $CredentialStorePath + $Name + ".json"
+
+    $Credential = Get-Item -Path $CredentialFilePath -ErrorAction SilentlyContinue
+
+    if ($Credential) {
+        $CurrentCredential = Get-Content -Path ($CredentialStorePath + "current.txt")
+        if ($CurrentCredential -eq $Name) {
+            try {
+                Write-Verbose "Current credential is set as $Name, make sure to use Set-SpotifyCredential to create new current credential."
+                Remove-Item -Path ($CredentialStorePath + "current.txt") -Force
+                Write-Verbose "Deleted file at $($CredentialStorePath + "current.txt")"
+            } catch {
+                Write-Warning "Unable to delete current.txt with $Name credentials."
+                break
+            }
+        }
+        try {
+            Write-Verbose "Attempting to delete $Name at $CredentialFilePath"
+            Remove-Item -Path $CredentialFilePath
+            Write-Verbose "Success"
+        } catch {
+            Write-Warning "Failed deleting $Name credential"
+            break
+        }
+    } else {
+        Write-Warning "There's no existing credential with name $Name"
     }
 }

@@ -11,7 +11,7 @@ function Get-SpotifyAccessToken {
     $AccessTokenStorePath = $SpotishellStore + "access_token\"
     $AccessTokenFilePath = $AccessTokenStorePath + $Name + ".json"
     $CredentialStorePath = $SpotishellStore + "credential\"
-    $CredentialFilePath = $CredentialStorePath + $Name + ".json"
+    #$CredentialFilePath = $CredentialStorePath + $Name + ".json"
 
     <# Check if we have a valid access token already #>
     if (!(Test-Path -Path $AccessTokenStorePath)) {
@@ -51,15 +51,21 @@ function Get-SpotifyAccessToken {
         Write-Warning "Couldn't find spotify credentials with name $Name"
         break
     }
-    <# The request is sent to the /api/token endpoint of the Accounts service:
-    POST https://accounts.spotify.com/api/token #>
-    $Uri = "https://accounts.spotify.com/api/token"
-    $Method = "Post"
 
-    <# The body of this POST request must contain the following parameters encoded
+    if ($SpotifyCredentials.ClientId -and $SpotifyCredentials.ClientSecret) {
+        <# The request is sent to the /api/token endpoint of the Accounts service:
+    POST https://accounts.spotify.com/api/token #>
+        $Uri = "https://accounts.spotify.com/api/token"
+        $Method = "Post"
+
+        <# The body of this POST request must contain the following parameters encoded
     in application/x-www-form-urlencoded as defined in the OAuth 2.0 specification #>
-    $Body = @{
-        "grant_type" = "client_credentials"
+        $Body = @{
+            "grant_type" = "client_credentials"
+        }
+
+    } else {
+        $SpotifyCredentials = New-SpotifyCredential -Name $Name -ClientId (Read-Host -Prompt "ClientId") -ClientSecret (Read-Host "ClientSecret")
     }
 
     <# Base 64 encoded string that contains the client ID and client secret key. #>
@@ -71,11 +77,11 @@ function Get-SpotifyAccessToken {
 
     <# Call api for auth token #>
     try {
-        Write-Verbose "Attempting to send request to API"
+        Write-Verbose "Attempting to send request to API to get access token."
         $Response = Invoke-WebRequest -Uri $Uri -Method $Method -Body $Body -Headers $Auth
         $CurrentTime = Get-Date
     } catch {
-        Write-Warning "Failed sending request to API"
+        Write-Warning "Failed sending request to API to get access token."
         break
     }
 

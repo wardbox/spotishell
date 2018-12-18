@@ -24,7 +24,7 @@ function  Get-SpotifyCredential {
         $Credential = Get-Content $ExistingCredential | ConvertFrom-Json -ErrorAction Stop
         return $Credential
     } else {
-        Write-Warning "No crednetial found with name $Name"
+        Write-Warning "No credential found with name $Name"
         return "No credential found with name $Name"
     }
 }

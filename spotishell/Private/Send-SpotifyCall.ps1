@@ -2,11 +2,6 @@ function Send-SpotifyCall {
     [CmdletBinding()]
     param (
 
-        # Name of spotify credential to use
-        [Parameter(Mandatory = $true)]
-        [String]
-        $CredentialName,
-
         # This is our method
         [Parameter(Mandatory = $true)]
         [string]
@@ -28,41 +23,43 @@ function Send-SpotifyCall {
         $Body
     )
 
-    $AccessToken = Get-SpotifyAccessToken -Name $CredentialName
+    $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
+    $CredentialStorePath = $SpotishellStore + "credential\"
+    $CredentialName = Get-Content -Path ($CredentialStorePath + "current.txt")
 
-    if (!($Header)) {
-        $Header = @{
-            "Authorization" = "Basic " + $AccessToken.access_token
+    if ($CredentialName) {
+
+        $AccessToken = Get-SpotifyAccessToken -Name $CredentialName
+
+        if (!($Header)) {
+            $Header = @{
+                "Authorization" = "Bearer " + $AccessToken.access_token
+            }
         }
-    }
 
-    if (!($Body)) {
-        <# The body of this POST request must contain the following parameters encoded
-        in application/x-www-form-urlencoded as defined in the OAuth 2.0 specification #>
-        $Body = @{
-            "grant_type" = "client_credentials"
+        <# Call api for auth token #>
+        try {
+            Write-Verbose "Attempting to send request to API"
+            if ($Body) {
+                $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
+            } else {
+                $Response = Invoke-WebRequest -Method $Method -Headers $Header -Uri $Uri
+            }
+        } catch {
+            Write-Warning "Failed sending request to API"
+            break
         }
-    }
 
-    <# Call api for auth token #>
-    try {
-        Write-Verbose "Attempting to send request to API"
-        if ($Body) {
-            $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
+        if ($Response) {
+            Write-Verbose "We got a response!"
+            $Response = $Response.Content | ConvertFrom-Json
+            return $Response
         } else {
-            $Response = Invoke-WebRequest -Method $Method -Headers $Header -Uri $Uri
+            Write-Warning "No response!"
+            break
         }
-    } catch {
-        Write-Warning "Failed sending request to API"
-        break
-    }
-
-    if ($Response) {
-        Write-Verbose "We got a response!"
-        $Response = $Response.Content | ConvertFrom-Json
-        return $Response
     } else {
-        Write-Warning "No response!"
+        Write-Warning "No current credential found. Either do New-SpotifyCredential or Set-SpotifyCredential first."
         break
     }
 }

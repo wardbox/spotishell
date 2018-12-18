@@ -62,13 +62,21 @@
     $CredentialJSON = $CredentialJSON | ConvertTo-Json -Depth 100
 
     if ($Overwrite -like "y*") {
-
         <# Try to save credential to file. #>
         try {
             Write-Verbose "Attempting to save credentials to $CredentialFilePath"
             $CredentialJSON | Out-File -FilePath $CredentialFilePath
             Write-Verbose "Successfully saved credentials to $CredentialFilePath"
-
+            if (Get-Item -Path ($CredentialStorePath + "current.txt")) {
+                $CurrentOverwrite = Read-Host "There's a current.txt with a different credential, want to overwrite it with $Name?(y/n)"
+                if ($CurrentOverwrite -like "y*") {
+                    Set-SpotifyCredential -Name $Name
+                }
+            } else {
+                Set-SpotifyCredential -Name $Name
+            }
+            $CredentialObject = Get-Content $CredentialFilePath | ConvertFrom-Json -ErrorAction Stop
+            return $CredentialObject
         } catch {
             Write-Warning "Failed saving credentials to $CredentialFilePath"
         }
