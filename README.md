@@ -7,7 +7,7 @@
 ---
 
 ## Prerequisites
-* <a href="https://developer.spotify.com/documentation/web-api/quick-start/" target="_blank">A spotify developer account and a registered app</a>
+* [A spotify developer account and a registered app](https://developer.spotify.com/documentation/web-api/quick-start/)
 * PowerShell 5.0 or later (working out kinks in Core)
 * A cup of coffee or a nice tea
 
