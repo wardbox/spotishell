@@ -1,0 +1,16 @@
+TOPIC
+    about_Spotishell
+
+SHORT DESCRIPTION
+    A powershell module used to easily interact with the Spotify API
+
+EXAMPLES
+    Search-Spotify -Query "Bloc Party" -Artist
+    New-SpotifyCredential -Name "blah" -ClientId "myclientId" -ClientSecret "myClientSecret"
+
+KEYWORDS
+    spotify, spotify-api, api, core, mac, linux
+
+SEE ALSO
+    https://github.com/wardbox/spotishell
+    https://developer.spotify.com/documentation/
