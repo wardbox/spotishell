@@ -23,7 +23,12 @@ function Send-SpotifyCall {
         $Body
     )
 
-    $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
+    if ($IsMacOS -or $IsLinux) {
+      $SpotishellStore = $home + "/" + "/.wardbox/spotishell/"
+    } else {
+      $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
+    }
+    
     $CredentialStorePath = $SpotishellStore + "credential\"
     $CredentialName = Get-Content -Path ($CredentialStorePath + "current.txt")
 
