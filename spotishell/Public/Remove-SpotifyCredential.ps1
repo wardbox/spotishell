@@ -1,4 +1,14 @@
 function Remove-SpotifyCredential {
+  <#
+  .SYNOPSIS
+    Removes a locally saved spotify credential
+  .EXAMPLE
+    PS C:\> Remove-SpotifyCredential -Name "dev"
+    Looks for a saved credential named "dev" and deletes it from your local machine.
+  .PARAMETER Name
+    This should be a string
+    Name of the credential you want to delete
+  #>
   param(
     # Name of our credential
     [Parameter(Mandatory = $true)]
@@ -11,7 +21,7 @@ function Remove-SpotifyCredential {
   } else {
     $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
   }
-  
+
   # If we don't have a credential store, tell user to make one
   if (!(Test-Path -Path $CredentialStorePath)) {
     Write-Warning "Failed attempting to create credential store at $CredentialStorePath"
