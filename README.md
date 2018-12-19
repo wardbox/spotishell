@@ -39,7 +39,7 @@ New-SpotifyCredential -Name "appname" -ClientId "blahblahblah" -ClientSecret "bl
 Search-Spotify -Query "Bloc Party" -Artist
 ```
 9. Enjoy the bountiful data :^)
----
+
 ```
 "Music is the silence between the notes"
   - Claude Debussy
