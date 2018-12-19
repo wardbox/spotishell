@@ -1,4 +1,23 @@
-﻿function  New-SpotifyCredential {
+function  New-SpotifyCredential {
+  <#
+  .SYNOPSIS
+    Creates a new credential file
+  .DESCRIPTION
+    Creates a new credential file and saves it locally so you may re-use it without setting it every time
+  .EXAMPLE
+    PS C:\> New-SpotifyCredential -Name "dev" -ClientId "blahblahID" -ClientSecret "blahblahSecret"
+    Creates a new credential json with name dev.json and supplied ClientId and ClientSecret.  Also asks if you want to set current.json to this if it exists,
+    otherwise just sets current.json to this credential.
+  .PARAMETER Name
+    This should be a string.
+    It is the name of the credential you want to save.  Personally, I recommend setting this to your registered project name
+  .PARAMETER ClientId
+    This should be a string
+    Obtained here: https://developer.spotify.com/dashboard/
+  .PARAMETER ClientSecret
+    This should be a string
+    Obtained here: https://developer.spotify.com/dashboard/
+  #>
   param (
     <# Credential name so user can identify it #>
     # Parameter help description

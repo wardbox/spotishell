@@ -1,4 +1,16 @@
 function  Get-SpotifyCredential {
+  <#
+  .SYNOPSIS
+    Retrieves saved spotify credential
+  .DESCRIPTION
+    Finds saved spotify credential on local machine if there is one.
+  .EXAMPLE
+    PS C:\> Get-SpotifyCredential -Name "dev"
+    Looks for a saved spotify credential file of the name "dev"
+  .PARAMETER Name
+    Should be a string.
+    This is the name of the spotify credential you've created already.
+  #>
   param (
     <# Credential name so user can identify it #>
     # Parameter help description

@@ -1,4 +1,17 @@
 function Get-SpotifyAccessToken {
+  <#
+  .SYNOPSIS
+    Gets a spotify access token
+  .DESCRIPTION
+    Gets a spotify access token by talking to the API and sending clientId and clientSecret
+  .EXAMPLE
+    PS C:\> Get-SpotifyAccessToken -Name "dev"
+    Looks for a saved credential named "dev" and tries to get an access token with it's credentials
+  .PARAMETER Name
+    Is a string, should be the name of your credential
+  .OUTPUTS
+    This will output the credential object
+  #>
   [CmdletBinding()]
   param (
     <# This is the name of the credential you want to use #>
@@ -12,7 +25,7 @@ function Get-SpotifyAccessToken {
   } else {
     $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
   }
-  
+
   $AccessTokenStorePath = $SpotishellStore + "access_token\"
   $AccessTokenFilePath = $AccessTokenStorePath + $Name + ".json"
   $CredentialStorePath = $SpotishellStore + "credential\"
