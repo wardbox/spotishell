@@ -4,14 +4,16 @@ $Private = @( Get-ChildItem -Path Spotishell\Private\*.ps1 -ErrorAction Silently
 
 #Dot source the files
 Foreach ($import in @($Public + $Private)) {
-    Try {
-        . $import.fullname
-    } Catch {
-        Write-Error -Message "Failed to import function $($import.fullname): $_"
-    }
+  Try {
+    . $import.fullname
+  } Catch {
+    Write-Error -Message "Failed to import function $($import.fullname): $_"
+  }
 }
 
-
+# create spotify credential
+# set spotify credential
+# delete spotify credential
 #find an artist
 $Artist = "Adam Tell"
 $ArtistObject = Search-Spotify -Query $Artist
