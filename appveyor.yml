@@ -1,0 +1,6 @@
+version: 0.1.{build}
+branches:
+  only:
+  - master
+build_script:
+- pwsh: Invoke-Pester
