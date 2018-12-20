@@ -2,7 +2,8 @@ version: 0.1.{build}
 branches:
   only:
     - master
-install:
-  - cinst pester -y
 build_script:
-  - pwsh: Invoke-Pester
+  - pwsh: >-
+      Import-Module Pester
+
+      Invoke-Pester
