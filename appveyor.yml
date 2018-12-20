@@ -4,6 +4,6 @@ branches:
     - master
 build_script:
   - pwsh: >-
+      Install-Module Pester
       Import-Module Pester
-
       Invoke-Pester
