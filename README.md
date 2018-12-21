@@ -8,9 +8,6 @@
 ### A powershell module used to interact with the Spotify API.
 
 **This is a work in progress, as such, some portions may not be production quality or work at all.**
-
----
-
 ## Prerequisites
 * [A spotify developer account and a registered app](https://developer.spotify.com/documentation/web-api/quick-start/)
 * PowerShell 5.0 or later
