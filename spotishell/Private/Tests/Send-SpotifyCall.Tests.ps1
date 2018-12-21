@@ -2,7 +2,7 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 . "$here\..\$sut"
 
-$AccessTokenScript = Get-ChildItem -Path "$here\..\" -Recurse | Where-Object Name -eq "Get-SpotifyAccessToken.ps1"
+$AccessTokenScript = Get-ChildItem -Path "$here\..\..\" -Exclude "*Tests.ps1" -Recurse | Where-Object Name -eq "Get-SpotifyAccessToken.ps1"
 . $AccessTokenScript.FullName
 
 # Variables
