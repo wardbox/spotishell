@@ -1,3 +1,5 @@
+<img src="https://i.imgur.com/plzJqJ0.png" height="100px">
+
 [![Build status](https://ci.appveyor.com/api/projects/status/nxxds8mg4yu1j3vr/branch/master?svg=true)](https://ci.appveyor.com/project/wardbox/spotishell/branch/master)
 # Spotishell
 ### A powershell module used to interact with the Spotify API.
