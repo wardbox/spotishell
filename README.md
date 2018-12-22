@@ -1,14 +1,16 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/nxxds8mg4yu1j3vr/branch/master?svg=true)](https://ci.appveyor.com/project/wardbox/spotishell/branch/master)
+
+<img src="https://i.imgur.com/plzJqJ0.png" height="72px">
 
 # Spotishell
+
+
 ### A powershell module used to interact with the Spotify API.
 
 **This is a work in progress, as such, some portions may not be production quality or work at all.**
-
----
-
 ## Prerequisites
 * [A spotify developer account and a registered app](https://developer.spotify.com/documentation/web-api/quick-start/)
-* PowerShell 5.0 or later (works on Mac and Linux too!)
+* PowerShell 5.0 or later
 * A cup of coffee or a nice tea
 
 ## Setup
