@@ -28,7 +28,7 @@ function Get-SpotifyAccessToken {
 
   $AccessTokenStorePath = $SpotishellStore + "access_token\"
   $AccessTokenFilePath = $AccessTokenStorePath + $Name + ".json"
-  $CredentialStorePath = $SpotishellStore + "credential\"
+  #$CredentialStorePath = $SpotishellStore + "credential\"
 
   <# Check if we have a valid access token already #>
   if (!(Test-Path -Path $AccessTokenStorePath)) {
