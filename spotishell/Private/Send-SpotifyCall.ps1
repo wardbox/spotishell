@@ -60,16 +60,11 @@ function Send-SpotifyCall {
     }
 
     <# Call api for auth token #>
-    try {
-      Write-Verbose "Attempting to send request to API"
-      if ($Body) {
-        $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
-      } else {
-        $Response = Invoke-WebRequest -Method $Method -Headers $Header -Uri $Uri
-      }
-    } catch {
-      Write-Warning "Failed sending request to API"
-      break
+    Write-Verbose "Attempting to send request to API"
+    if ($Body) {
+      $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
+    } else {
+      $Response = Invoke-WebRequest -Method $Method -Headers $Header -Uri $Uri
     }
 
     if ($Response) {
