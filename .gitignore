@@ -1,6 +1,7 @@
 
 \.vscode/
 
+\.DS_Store
 dev/publish-psgallery\.ps1
 
 dev/CombinedFunctions/Combined\.ps1
