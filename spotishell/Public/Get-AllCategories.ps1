@@ -1,16 +1,22 @@
 function Get-AllCategories {
   <#
 .SYNOPSIS
-    Gets all categories.
+    Gets a category.
 .DESCRIPTION
-    Get a list of categories used to tag items in Spotify (on, for example, the Spotify player’s “Browse” tab).
+    Get a single category used to tag items in Spotify (on, for example, the Spotify player’s “Browse” tab).
 .EXAMPLE
-    PS C:\> Get-AllCategories
-    Retrieves an album from spotify with the Id of "blahblahblah"
-.NOTES
-    Max limit is 50 categories.
+    PS C:\> Get-Category "toplists"
+    Retrieves details on a specific category with Id "toplists"
+.PARAMETER Id
+    This should be a string
+    The Id of the category we want to pull info on.
 #>
-
+param(
+  # Id
+  [Parameter(Mandatory)]
+  [String]
+  $Id
+)
   # Grabbing 2 letter country code from local info.
   $Country = ((Get-UICulture | Select-Object -Property Name).Name.ToString()).Split("-", "2")[1]
   # Grabbing 4 digit local/country code (this sets the language of the response)
@@ -40,6 +46,6 @@ function Get-AllCategories {
       return $Response
     }
   } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-Album"
+    Write-Warning "Failed sending Spotify API call for function Get-AllCategories"
   }
 }
