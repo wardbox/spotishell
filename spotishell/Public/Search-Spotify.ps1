@@ -59,13 +59,19 @@ function Search-Spotify {
 
   if ($Artist) {
     $Filters += "artist"
-  } elseif ($Album) {
+  }
+
+  if ($Album) {
     $Filters += "album"
-  } elseif ($Track) {
+  }
+  if ($Track) {
     $Filters += "track"
-  } elseif ($Playlist) {
+  }
+
+  if ($Playlist) {
     $Filters += "playlist"
-  } else {
+  }
+  if (!$Artist -and !$Album -and !$Track -and !$Playlist) {
     $Filters += "artist"
     $Filters += "album"
     $Filters += "track"
@@ -80,7 +86,7 @@ function Search-Spotify {
 
     foreach ($Record in $Filters) {
       if ($Count -gt 1) {
-        $Query += "$Record,"
+        $Query += "$Record%2C"
       } else {
         $Query += $Record
       }

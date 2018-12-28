@@ -3,7 +3,7 @@ function Get-AllCategories {
 .SYNOPSIS
     Gets a category.
 .DESCRIPTION
-    Get a single category used to tag items in Spotify (on, for example, the Spotify playerâ€™s â€œBrowseâ€ tab).
+    Get a single category used to tag items in Spotify (on, for example, the Spotify player’s “Browse” tab).
 .EXAMPLE
     PS C:\> Get-Category "toplists"
     Retrieves details on a specific category with Id "toplists"
@@ -41,6 +41,7 @@ param(
         $ResponseArray += $Response
         $Response = (Send-SpotifyCall -Method $Method -Uri $Response.next -ErrorAction Stop).categories
       }
+      $ResponseArray += $Response
       return $ResponseArray
     } else {
       return $Response

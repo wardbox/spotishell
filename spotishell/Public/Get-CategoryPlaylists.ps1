@@ -39,6 +39,7 @@ param(
         $Response = (Send-SpotifyCall -Method $Method -Uri $Response.next -ErrorAction Stop).playlists
         $ResponseArray += $Response
       }
+      $ResponseArray += $Response
       return $ResponseArray
     } else {
       return $Response
