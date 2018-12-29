@@ -7,8 +7,8 @@ function Get-Album {
 .EXAMPLE
     PS C:\> Get-Album -Id "blahblahblah"
     Retrieves an album from spotify with the Id of "blahblahblah"
-.INPUTS
-    String
+.PARAMETER Id
+    Should be a string.
 #>
   param (
     # Id of the album we want to get information on
