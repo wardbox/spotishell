@@ -9,11 +9,12 @@ function Get-FeaturedPlaylists {
   .EXAMPLE
     PS C:\> Get-FeaturedPlaylists
     Retrieves all featured playlists
+  .NOTES
+    50 is the limit, it'll page through if there are more
   #>
 
   $Uri = "https://api.spotify.com/v1/browse/featured-playlists?limit=50"
   $Method = "Get"
-
 
   $Response = (Send-SpotifyCall -Method $Method -Uri $Uri).playlists
   if ($Response.next) {
@@ -29,5 +30,4 @@ function Get-FeaturedPlaylists {
     return $Response
   }
   return $ResponseArray
-
 }
