@@ -6,14 +6,13 @@ function Get-SpotifyAuthCode {
     $Name
   )
   
-  $Method = "Get"
   $Credential = Get-SpotifyCredential -Name $Name
   $ClientId = "client_id=" + $Credential.clientid
   $ResponseType = "response_type=code"
   $RedirectURI = "redirect_uri=http%3A%2F%2Flocalhost%2Fspotifyapi"
   $BaseURI = "https://accounts.spotify.com/authorize?"
-  $Guid = "state=" + [guid]::NewGuid()
-  $URI = $BaseURI + $ClientId + "&" + $ResponseType + "&" + $RedirectURI + "&" + $Guid
+  $Guid = [guid]::NewGuid()
+  $URI = $BaseURI + $ClientId + "&" + $ResponseType + "&" + $RedirectURI + "&state=" + $Guid
 
   if ($IsMacOS) {
     # opens the constructed uri in default browser on mac
@@ -22,14 +21,20 @@ function Get-SpotifyAuthCode {
     
   }
   $Response = Read-Host "paste the entire url that it redirects you to"
-  $CodeWithGuid = $Response.split("?")[1]
-  $Code = $CodeWithGuid.split("&")[0]
-  $ResponseGuid = $CodeWithGuid.split("&")[1]
-  if($ResponseGuid -eq $Guid){
-    $AuthCode = $Code
-  } else {
-    Write-Warning "Doesn't contain secure guid."
-    break
+  $Response = $Response.Split("spotifyapi?")[1]
+  $Code = $Response.Split("&state=")[0]
+  $ResponseGuid = $Response.Split("&state=")[1]
+
+  # If our response guid doesn't match the one we made, we don't want to proceed
+  if ($ResponseGuid -ne $Guid) {
+    Write-Warning "The response guid does not match our records."
+    return $Response
   }
-  return $AuthCode
+
+  if ($Code -eq "error=access_denied&state=$Guid") {
+    Write-Warning "We didn't successfully retrieve an auth code.  This may be due to expired credentials or wardbox messed up."
+    return $Code
+  }
+  $Code = $Code.Replace("code=", "")
+  return $Code
 }
