@@ -2,6 +2,7 @@
 
 # Spotishell
 
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg?style=for-the-badge&logo=appveyor)](https://www.paypal.me/wardbox/5)
 
 ### A powershell module used to interact with the Spotify API.
 
