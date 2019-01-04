@@ -28,10 +28,13 @@ function Get-SpotifyUserAccessToken {
   if ($IsMacOS -or $IsLinux) {
     $SpotishellStore = $home + "/.wardbox/spotishell/"
     $UserAccessTokenStorePath = $SpotishellStore + "user_access_tokens/"
-    $UserAccessTokenFilePath = $UserAccessTokenStorePath + "$Username.json"
   } else {
     $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
+    $UserAccessTokenStorePath = $SpotishellStore + "user_access_tokens\"
   }
+
+  $UserAccessTokenFilePath = $UserAccessTokenStorePath + "$Username.json"
+
   <# Check if we have a valid access token already #>
   if (!(Test-Path -Path $UserAccessTokenStorePath)) {
     <# There is no access token store, let's try to make one. #>
