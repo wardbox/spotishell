@@ -1,17 +1,17 @@
-function Get-UserTopTracks {
+function Get-UserTopArtists {
   <#
   .SYNOPSIS
-    Get top tracks for user
+    Get top artists for user
   .EXAMPLE
-    PS C:\> Get-UserTopTracks -Range "long"
-    Gets top tracks for user over several years
+    PS C:\> Get-UserTopArtists -Range "long"
+    Gets top artists for user over several years
   .PARAMETER Range
   Long (calculated from several years of data and including all new data as it becomes available)
   Medium (approximately last 6 months)
   Short (approximately last 4 weeks)
   #>
   param (
-    # Username of person we want top tracks for
+    # Username of person we want top artists for
     [Parameter(Mandatory)]
     [String]
     $Username,
@@ -33,7 +33,7 @@ function Get-UserTopTracks {
   
   Write-Verbose "Attempting to return info on Spotify profile with username of $Username"
   $Method = "Get"
-  $Uri = "https://api.spotify.com/v1/me/top/tracks?time_range=$TimeRange&limit=50&offset=0"
+  $Uri = "https://api.spotify.com/v1/me/top/artists?time_range=$TimeRange&limit=50&offset=0"
   $AccessToken = Get-SpotifyUserAccessToken -Username $Username
   $Auth = @{
     Authorization = "Bearer $($AccessToken.access_token)"
@@ -51,6 +51,6 @@ function Get-UserTopTracks {
     }
     return $Response
   } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-UserTopTracks"
+    Write-Warning "Failed sending Spotify API call for function Get-UserTopArtists"
   }
 }
