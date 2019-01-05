@@ -14,12 +14,7 @@ function Get-SpotifyUserAccessToken {
   #>
   [CmdletBinding()]
   param (
-    <# This is the name of the credential you want to use #>
-    [Parameter(Mandatory = $true)]
-    [String]
-    $CredentialName,
-
-    # Parameter help description
+    # Spotify username
     [Parameter(Mandatory = $true)]
     [String]
     $Username
@@ -70,9 +65,9 @@ function Get-SpotifyUserAccessToken {
   }
 
   try {
-    $SpotifyCredentials = Get-SpotifyCredential -Name $CredentialName -ErrorAction Stop
+    $SpotifyCredentials = Get-SpotifyCredential
   } catch {
-    Write-Warning "Couldn't find spotify credentials with name $Name"
+    Write-Warning "Couldn't find spotify credentials.  Try New-SpotifyCredentials."
     break
   }
 

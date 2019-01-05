@@ -5,7 +5,7 @@ function Get-MyProfile {
   .EXAMPLE
     PS C:\> Get-MyProfile -AccessToken "xyz"
     Gets profile info for the user authed under the current access token
-  .PARAMETER AccessToken
+  .PARAMETER Username
   This should be a string.
   You get this from running Get-SpotifyUserAccessToken
   #>
@@ -13,13 +13,14 @@ function Get-MyProfile {
     # UserAccessToken
     [Parameter(Mandatory)]
     [String]
-    $AccessToken
+    $Username
   )
   Write-Verbose "Attempting to return info on your Spotify profile"
   $Method = "Get"
   $Uri = "https://api.spotify.com/v1/me"
+  $AccessToken = Get-SpotifyUserAccessToken -Username $Username
   $Auth = @{
-    Authorization = "Bearer $AccessToken"
+    Authorization = "Bearer $($AccessToken.access_token)"
   }
 
   try {
