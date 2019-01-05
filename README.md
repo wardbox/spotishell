@@ -18,8 +18,6 @@
 Install-Module Spotishell
 ```
 
-##### You may also clone from GitHub, if you want to do this I presume you know how :^)
-
 2. Import module
 ```powershell
 Import-Module Spotishell
@@ -28,18 +26,15 @@ Import-Module Spotishell
 ```powershell
 Get-Command -Module Spotishell
 ```
-##### 4. Sip drink of choice (optional)
-##### 5. Take a breath (required!)
-##### 6. Alright, let's continue (optional)
-7. Set up your credential (use keys from your registered app referenced in the prerequisites
+4. Set up your credential (use keys from your registered app referenced in the prerequisites
 ```powershell
 New-SpotifyCredential -Name "appname" -ClientId "blahblahblah" -ClientSecret "blahblahblahblah"
 ```
-8. Give it a whirl!
+5. Give it a whirl!
 ```powershell
 Search-Spotify -Query "Bloc Party" -Artist
 ```
-9. Enjoy the bountiful data :^)
+6. Enjoy the bountiful data :^)
 
 ```
 "Music is the silence between the notes"
