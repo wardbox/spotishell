@@ -41,7 +41,7 @@ function Send-SpotifyCall {
   )
 
   if ($IsMacOS -or $IsLinux) {
-    $SpotishellStore = $home + "/" + "/.wardbox/spotishell/"
+    $SpotishellStore = $home + "/.wardbox/spotishell/"
   } else {
     $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
   }
@@ -69,7 +69,9 @@ function Send-SpotifyCall {
 
     if ($Response) {
       Write-Verbose "We got a response!"
-      $Response = $Response.Content | ConvertFrom-Json
+      if ($Response.StatusCode -eq "200") {
+        $Response = $Response.Content | ConvertFrom-Json
+      }
       return $Response
     } else {
       Write-Warning "No response!"

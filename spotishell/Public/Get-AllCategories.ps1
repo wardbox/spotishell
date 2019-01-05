@@ -1,22 +1,9 @@
 function Get-AllCategories {
   <#
 .SYNOPSIS
-    Gets a category.
-.DESCRIPTION
-    Get a single category used to tag items in Spotify (on, for example, the Spotify player�s �Browse� tab).
-.EXAMPLE
-    PS C:\> Get-Category "toplists"
-    Retrieves details on a specific category with Id "toplists"
-.PARAMETER Id
-    This should be a string
-    The Id of the category we want to pull info on.
+    Gets all categories
 #>
-param(
-  # Id
-  [Parameter(Mandatory)]
-  [String]
-  $Id
-)
+
   # Grabbing 2 letter country code from local info.
   $Country = ((Get-UICulture | Select-Object -Property Name).Name.ToString()).Split("-", "2")[1]
   # Grabbing 4 digit local/country code (this sets the language of the response)
