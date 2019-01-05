@@ -1,4 +1,10 @@
 function Get-AvailableDevices {
+  <#
+  .SYNOPSIS
+    List available devices for user
+  .EXAMPLE
+    PS C:\> Get-AvailableDevices -Username "blahblah"
+  #>
   param(
     # Username
     [Parameter(Mandatory)]
@@ -14,10 +20,6 @@ function Get-AvailableDevices {
     Authorization = "Bearer $($UserAccessToken.access_token)"
   }
 
-  try {
-    $Response = Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -ErrorAction Stop
-    return $Response.devices
-  } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-AvailableDevices"
-  }
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -ErrorAction Stop
+  return $Response.devices
 }

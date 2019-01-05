@@ -26,13 +26,13 @@ function  New-SpotifyCredential {
     $Name,
 
     <# Client ID, obtained from one of your applications on the Spotify developer dashboard:
-        https://developer.spotify.com/dashboard/applications (as of this writing) #>
+    https://developer.spotify.com/dashboard/applications (as of this writing) #>
     [Parameter(Mandatory = $true)]
     [String]
     $ClientId,
 
     <# Client Secret, obtained from one of your applications on the Spotify developer dashboard:
-        https://developer.spotify.com/dashboard/applications (as of this writing) #>
+    https://developer.spotify.com/dashboard/applications (as of this writing) #>
     [Parameter(Mandatory = $true)]
     [String]
     $ClientSecret
@@ -49,7 +49,7 @@ function  New-SpotifyCredential {
 
   if (!(Test-Path -Path $CredentialStorePath)) {
 
-    <# 1. There is no credential repo, let's try to make one. #>
+    <# There is no credential repo, let's try to make one. #>
     try {
       Write-Verbose "Attempting to create credential store at $CredentialStorePath"
       New-Item -Path $CredentialStorePath -ItemType Directory -ErrorAction Stop

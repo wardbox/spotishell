@@ -6,8 +6,8 @@ function Get-MyProfile {
     PS C:\> Get-MyProfile -AccessToken "xyz"
     Gets profile info for the user authed under the current access token
   .PARAMETER Username
-  This should be a string.
-  You get this from running Get-SpotifyUserAccessToken
+    This should be a string.
+    You get this from running Get-SpotifyUserAccessToken
   #>
   param (
     # UserAccessToken
@@ -23,10 +23,6 @@ function Get-MyProfile {
     Authorization = "Bearer $($AccessToken.access_token)"
   }
 
-  try {
-    $Response = Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -ErrorAction Stop
-    return $Response
-  } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-MyProfile"
-  }
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -ErrorAction Stop
+  return $Response
 }

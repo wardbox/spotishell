@@ -6,8 +6,8 @@ function Get-UserProfile {
     PS C:\> Get-UserProfile -Username "myusername"
    Gets the public user profile information about myusername
   .PARAMETER Username
-  This should be a string.
-  Username of the spotify user we want to search for
+    This should be a string.
+    Username of the spotify user we want to search for
   #>
   param (
     # Username
@@ -20,10 +20,6 @@ function Get-UserProfile {
   $Method = "Get"
   $Uri = "https://api.spotify.com/v1/users/" + $Username
 
-  try {
-    $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-    return $Response
-  } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-UserProfile"
-  }
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
+  return $Response
 }

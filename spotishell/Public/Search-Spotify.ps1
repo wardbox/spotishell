@@ -11,20 +11,20 @@ function Search-Spotify {
     PS C:\> Search-Spotify -Query "Party"
     Will search for anything named "Party" in spotify, except users.
   .PARAMETER Query
-  This should be a string
-  Our query for spotify
+    This should be a string
+    Our query for spotify
   .PARAMETER Artist
-  This is a switch
-  If selected, will search for specifically Artists
+    This is a switch
+    If selected, will search for specifically Artists
   .PARAMETER Album
-  This is a switch
-  If selected, will search for specifically Albums
+    This is a switch
+    If selected, will search for specifically Albums
   .PARAMETER Track
-  This is a switch
-  If selected, will search for specifically Tracks
+    This is a switch
+    If selected, will search for specifically Tracks
   .PARAMETER Playlist
-  This is a switch
-  If selected, will search for specifically Playlists
+    This is a switch
+    If selected, will search for specifically Playlists
   #>
   param (
     # The data we want to look for
@@ -101,5 +101,4 @@ function Search-Spotify {
 
   $Response = Send-SpotifyCall -Method $Method -Uri $Uri
   return $Response
-
 }
