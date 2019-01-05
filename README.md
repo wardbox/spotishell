@@ -26,7 +26,7 @@ Import-Module Spotishell
 ```powershell
 Get-Command -Module Spotishell
 ```
-4. Set up your credential (use keys from your registered app referenced in the prerequisites
+4. Set up your credential (use keys from your registered app referenced in the prerequisites)
 ```powershell
 New-SpotifyCredential -Name "appname" -ClientId "blahblahblah" -ClientSecret "blahblahblahblah"
 ```
