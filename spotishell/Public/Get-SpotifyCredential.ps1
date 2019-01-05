@@ -14,13 +14,13 @@ function  Get-SpotifyCredential {
   param (
     <# Credential name so user can identify it #>
     # Parameter help description
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [String]
     $Name
   )
 
   if ($IsMacOS -or $IsLinux) {
-    $CredentialStorePath = $home + "/" + "/.wardbox/spotishell/credential/"
+    $CredentialStorePath = $home + "/.wardbox/spotishell/credential/"
   } else {
     $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
   }
@@ -31,6 +31,11 @@ function  Get-SpotifyCredential {
 
   Write-Verbose "Credential store exists at $CredentialStorePath"
 
+  if (!$Name) {
+    $CurrentPath = $CredentialStorePath + "current.txt"
+    $Name = Get-Content -Path $CurrentPath
+  }
+  
   <# Construct filepath #>
   $CredentialFilePath = $CredentialStorePath + $Name + ".json"
 
