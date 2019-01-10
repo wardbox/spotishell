@@ -35,5 +35,7 @@ function Suspend-Playback {
   }
 
   $Response = Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -ErrorAction Stop
-  return $Response
+  if ($Response.StatusCode -ne "204") {
+    return $Response
+  }
 }

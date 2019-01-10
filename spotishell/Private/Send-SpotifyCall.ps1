@@ -34,9 +34,8 @@ function Send-SpotifyCall {
     [hashtable]
     $Header,
 
-    # Body for call, typically contains sporadic values. Should always be a hash table still.
+    # Body for call, typically contains sporadic values.
     [Parameter(Mandatory = $false)]
-    [hashtable]
     $Body
   )
 
@@ -62,6 +61,7 @@ function Send-SpotifyCall {
     <# Call api for auth token #>
     Write-Verbose "Attempting to send request to API"
     if ($Body) {
+      $Body = $Body | ConvertTo-Json
       $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
     } else {
       $Response = Invoke-WebRequest -Method $Method -Headers $Header -Uri $Uri

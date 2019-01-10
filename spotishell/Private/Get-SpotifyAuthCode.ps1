@@ -5,7 +5,7 @@ function Get-SpotifyAuthCode {
     [string]
     $Name
   )
-  
+
   if ($Name) {
     $Credential = Get-SpotifyCredential -Name $Name
   } else {
@@ -54,7 +54,8 @@ function Get-SpotifyAuthCode {
     Write-Verbose "We are on Mac OS"
     open $URI
   } elseif ($IsWindows) {
-    
+    Write-Verbose "We are on Windows"
+    rundll32 url.dll,FileProtocolHandler $URI
   }
 
   $Response = Read-Host "Paste the entire URL that it redirects you to"
