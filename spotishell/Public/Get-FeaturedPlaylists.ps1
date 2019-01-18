@@ -1,5 +1,3 @@
-
-
 function Get-FeaturedPlaylists {
   <#
   .SYNOPSIS

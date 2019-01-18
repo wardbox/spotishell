@@ -8,10 +8,10 @@ function Set-SpotifyCredential {
     PS C:\> Set-SpotifyCredential -Name "dev"
     Looks to see if there's a credential named dev.json and sets it to be the current credential if so
   .PARAMETER Name
-  This should be a string
-  Name of the credential you want to set
+    This should be a string
+    Name of the credential you want to set
   .NOTES
-  Doesn't output any object
+    Doesn't output any object
   #>
     param(
         # Name of our credential we've created
@@ -20,11 +20,11 @@ function Set-SpotifyCredential {
         $Name
     )
 
-    if ($IsMacOS -or $IsLinux) {
-        $CredentialStorePath = $home + "/" + "/.wardbox/spotishell/credential/"
-    } else {
-        $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
-    }
+  if ($IsMacOS -or $IsLinux) {
+    $CredentialStorePath = $home + "/.wardbox/spotishell/credential/"
+  } else {
+    $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
+  }
 
     # If we don't have a credential store, tell user to make one
     if (!(Test-Path -Path $CredentialStorePath)) {

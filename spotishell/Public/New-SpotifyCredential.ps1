@@ -24,41 +24,40 @@ function  New-SpotifyCredential {
         [Parameter(Mandatory = $true)]
         [String]
         $Name,
+        
+    <# Client ID, obtained from one of your applications on the Spotify developer dashboard:
+    https://developer.spotify.com/dashboard/applications (as of this writing) #>
+    [Parameter(Mandatory = $true)]
+    [String]
+    $ClientId,
 
-        <# Client ID, obtained from one of your applications on the Spotify developer dashboard:
-        https://developer.spotify.com/dashboard/applications (as of this writing) #>
-        [Parameter(Mandatory = $true)]
-        [String]
-        $ClientId,
+    <# Client Secret, obtained from one of your applications on the Spotify developer dashboard:
+    https://developer.spotify.com/dashboard/applications (as of this writing) #>
+    [Parameter(Mandatory = $true)]
+    [String]
+    $ClientSecret
+  )
 
-        <# Client Secret, obtained from one of your applications on the Spotify developer dashboard:
-        https://developer.spotify.com/dashboard/applications (as of this writing) #>
-        [Parameter(Mandatory = $true)]
-        [String]
-        $ClientSecret
-    )
-
-    if ($IsMacOS -or $IsLinux) {
-        $CredentialStorePath = $home + "/" + "/.wardbox/spotishell/credential/"
-    } else {
-        $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
-    }
+  if ($IsMacOS -or $IsLinux) {
+    $CredentialStorePath = $home + "/.wardbox/spotishell/credential/"
+  } else {
+    $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
 
     <# We don't want to destroy any existing credential files, proceeding with caution. #>
     $Overwrite = "n"
 
     if (!(Test-Path -Path $CredentialStorePath)) {
 
-        <# 1. There is no credential repo, let's try to make one. #>
-        try {
-            Write-Verbose "Attempting to create credential store at $CredentialStorePath"
-            New-Item -Path $CredentialStorePath -ItemType Directory -ErrorAction Stop
-            Write-Verbose "Successfully created credential store at $CredentialStorePath"
-        } catch {
-            Write-Warning "Failed attempting to create credential store at $CredentialStorePath"
-            Write-Warning "Check error for more details."
-            break
-        }
+      <# There is no credential repo, let's try to make one. #>
+      try {
+        Write-Verbose "Attempting to create credential store at $CredentialStorePath"
+        New-Item -Path $CredentialStorePath -ItemType Directory -ErrorAction Stop
+        Write-Verbose "Successfully created credential store at $CredentialStorePath"
+      } catch {
+        Write-Warning "Failed attempting to create credential store at $CredentialStorePath"
+        Write-Warning "Check error for more details."
+        break
+      }
 
     }
 

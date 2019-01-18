@@ -1,27 +1,27 @@
 function Get-Recommendations {
   <#
-.SYNOPSIS
-  Gets recommendations.
-.DESCRIPTION
-  Recommendations are generated based on the available information
-  for a given seed entity and matched against similar artists and tracks.
-  If there is sufficient information about the provided seeds, a list of
-  tracks will be returned together with pool size details.
-.EXAMPLE
-  PS C:\> Get-Recommendations -SeedArtists @("artist1", "artist2") -SeedGenres @("genre1") -SeedTracks @("track1")
-  Retrieves recommendations based on all provided attributes
-.PARAMETER SeedArtists
-  This should be a comma separated list of spotify Ids for artists.
-  Up to 5 seed values may be provided in any combination of seed_artists, seed_tracks and seed_genres.
-.PARAMETER SeedGenres
-  This should be a comma separated list of any genres in the set of available genre seeds. Up to 5 seed
-  values may be provided in any combination of seed_artists, seed_tracks and seed_genres.
-.PARAMETER SeedTracks
-  This should be a comma separated list of Spotify IDs for a seed track. Up to 5 seed values may be
-  provided in any combination of seed_artists, seed_tracks and seed_genres.
-.NOTES
-  Max 100 recommendations can be pulled
-#>
+  .SYNOPSIS
+    Gets recommendations.
+  .DESCRIPTION
+    Recommendations are generated based on the available information
+    for a given seed entity and matched against similar artists and tracks.
+    If there is sufficient information about the provided seeds, a list of
+    tracks will be returned together with pool size details.
+  .EXAMPLE
+    PS C:\> Get-Recommendations -SeedArtists @("artist1", "artist2") -SeedGenres @("genre1") -SeedTracks @("track1")
+    Retrieves recommendations based on all provided attributes
+  .PARAMETER SeedArtists
+    This should be a comma separated list of spotify Ids for artists.
+    Up to 5 seed values may be provided in any combination of seed_artists, seed_tracks and seed_genres.
+  .PARAMETER SeedGenres
+    This should be a comma separated list of any genres in the set of available genre seeds. Up to 5 seed
+    values may be provided in any combination of seed_artists, seed_tracks and seed_genres.
+  .PARAMETER SeedTracks
+    This should be a comma separated list of Spotify IDs for a seed track. Up to 5 seed values may be
+    provided in any combination of seed_artists, seed_tracks and seed_genres.
+  .NOTES
+    Max 100 recommendations can be pulled
+  #>
   param (
     # Our seed artist spotify Ids
     [Parameter(Mandatory = $false)]
@@ -48,7 +48,7 @@ function Get-Recommendations {
   $Genres = ""
   $Tracks = ""
   $Query = ""
-  $Limit="100"
+  $Limit = "100"
 
   if (!$SeedArtists -and !$SeedTracks) {
     Write-Warning "You need to supply at least 1 artist or track."
@@ -135,11 +135,6 @@ function Get-Recommendations {
 
   }
 
-  try {
-    $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-    return $Response.tracks
-  } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-Recommendations"
-  }
-
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
+  return $Response.tracks
 }

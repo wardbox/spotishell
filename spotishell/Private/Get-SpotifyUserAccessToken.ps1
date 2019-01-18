@@ -71,19 +71,12 @@ function Get-SpotifyUserAccessToken {
     break
   }
 
-  if (!$ExistingAccessToken) {
-    $AuthCode = Get-SpotifyAuthCode -Name "wardbox"
-  } else {
-    $AuthCode = $ExistingAccessToken.refresh_token
-  }
-
   if ($SpotifyCredentials.ClientId -and $SpotifyCredentials.ClientSecret) {
     $Uri = "https://accounts.spotify.com/api/token"
     $Method = "Post"
 
-    <# The body of this POST request must contain the following parameters encoded
-    in application/x-www-form-urlencoded as defined in the OAuth 2.0 specification #>
-    if (!$ExistingAccessToken) {
+    if (!$ExistingAccessToken.refresh_token) {
+      $AuthCode = Get-SpotifyAuthCode
       $Body = @{
         "grant_type"   = "authorization_code"
         "code"         = $AuthCode
@@ -92,7 +85,7 @@ function Get-SpotifyUserAccessToken {
     } else {
       $Body = @{
         "grant_type"    = "refresh_token"
-        "refresh_token" = "$($ExistingAccessToken.refresh_token)"
+        "refresh_token" = $ExistingAccessToken.refresh_token
       }
     }
   } else {
@@ -126,7 +119,7 @@ function Get-SpotifyUserAccessToken {
           access_token  = $Response."access_token"
           token_type    = $Response."token_type"
           scope         = $Response."scope"
-          expires_in    = "$Expires"
+          expires_in    = $Expires
           refresh_token = $Response."refresh_token"
         }
         $UserAccessTokenJSON | ConvertTo-Json -Depth 100 | Out-File -FilePath $UserAccessTokenFilePath

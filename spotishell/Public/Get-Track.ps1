@@ -1,15 +1,15 @@
 function Get-Track {
   <#
-.SYNOPSIS
+  .SYNOPSIS
     Gets a track.
-.DESCRIPTION
+  .DESCRIPTION
     Gets a track with a specific spotify Id, only takes one
-.EXAMPLE
+  .EXAMPLE
     PS C:\> Get-Track -Id "blahblahblah"
     Retrieves a track from spotify with the Id of "blahblahblah"
-.PARAMETER Id
+  .PARAMETER Id
     The spotify Id of the track we want to look up
-#>
+  #>
   param (
     # Id of the track we want to look up
     [Parameter(Mandatory)]
@@ -21,10 +21,6 @@ function Get-Track {
   $Method = "Get"
   $Uri = "https://api.spotify.com/v1/tracks/" + $Id
 
-  try {
-    $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-    return $Response
-  } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-Track"
-  }
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
+  return $Response
 }

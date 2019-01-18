@@ -1,7 +1,7 @@
 function Get-ArtistAlbums {
   <#
 .SYNOPSIS
-    Get Spotify catalog information about an artist’s albums.
+    Get Spotify catalog information about an artistï¿½s albums.
 .DESCRIPTION
     Optional parameters can be specified in the query string to filter and sort the response.
 .EXAMPLE
@@ -85,10 +85,6 @@ function Get-ArtistAlbums {
 
   $Uri += "&limit=50"
 
-  try {
-    $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-    return $Response
-  } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-ArtistAlbums"
-  }
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
+  return $Response
 }

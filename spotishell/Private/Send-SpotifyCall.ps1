@@ -34,14 +34,13 @@ function Send-SpotifyCall {
     [hashtable]
     $Header,
 
-    # Body for call, typically contains sporadic values. Should always be a hash table still.
+    # Body for call, typically contains sporadic values.
     [Parameter(Mandatory = $false)]
-    [hashtable]
     $Body
   )
 
   if ($IsMacOS -or $IsLinux) {
-    $SpotishellStore = $home + "/" + "/.wardbox/spotishell/"
+    $SpotishellStore = $home + "/.wardbox/spotishell/"
   } else {
     $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
   }
@@ -62,6 +61,7 @@ function Send-SpotifyCall {
     <# Call api for auth token #>
     Write-Verbose "Attempting to send request to API"
     if ($Body) {
+      $Body = $Body | ConvertTo-Json
       $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
     } else {
       $Response = Invoke-WebRequest -Method $Method -Headers $Header -Uri $Uri
@@ -69,7 +69,9 @@ function Send-SpotifyCall {
 
     if ($Response) {
       Write-Verbose "We got a response!"
-      $Response = $Response.Content | ConvertFrom-Json
+      if ($Response.StatusCode -eq "200") {
+        $Response = $Response.Content | ConvertFrom-Json
+      }
       return $Response
     } else {
       Write-Warning "No response!"

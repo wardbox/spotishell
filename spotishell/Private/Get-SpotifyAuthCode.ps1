@@ -1,12 +1,16 @@
 function Get-SpotifyAuthCode {
   param (
     # The name of the spotify credentials we've saved
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory = $false)]
     [string]
     $Name
   )
-  
-  $Credential = Get-SpotifyCredential -Name $Name
+
+  if ($Name) {
+    $Credential = Get-SpotifyCredential -Name $Name
+  } else {
+    $Credential = Get-SpotifyCredential
+  }
   $ClientId = "client_id=" + $Credential.clientid
   $ResponseType = "response_type=code"
   $RedirectURI = "redirect_uri=http%3A%2F%2Flocalhost%2Fspotifyapi"
@@ -50,7 +54,8 @@ function Get-SpotifyAuthCode {
     Write-Verbose "We are on Mac OS"
     open $URI
   } elseif ($IsWindows) {
-    
+    Write-Verbose "We are on Windows"
+    rundll32 url.dll,FileProtocolHandler $URI
   }
 
   $Response = Read-Host "Paste the entire URL that it redirects you to"

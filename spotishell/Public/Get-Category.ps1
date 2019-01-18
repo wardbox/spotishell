@@ -1,16 +1,16 @@
 function Get-Category {
   <#
-.SYNOPSIS
+  .SYNOPSIS
     Gets a category.
-.DESCRIPTION
+  .DESCRIPTION
     Get a single category used to tag items in Spotify (on, for example, the Spotify player’s “Browse” tab).
-.EXAMPLE
+  .EXAMPLE
     PS C:\> Get-Category "toplists"
     Retrieves details on a specific category with Id "toplists"
-.PARAMETER Id
+  .PARAMETER Id
     This should be a string
     The Id of the category we want to pull info on.
-#>
+  #>
   param(
     # Id
     [Parameter(Mandatory)]
@@ -22,10 +22,6 @@ function Get-Category {
   $Method = "Get"
   $Uri = "https://api.spotify.com/v1/browse/categories/" + "$Id"
 
-  try {
-    $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-    return $Response
-  } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-Category"
-  }
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
+  return $Response
 }

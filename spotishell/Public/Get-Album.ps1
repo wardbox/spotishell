@@ -20,10 +20,6 @@ function Get-Album {
   $Method = "Get"
   $Uri = "https://api.spotify.com/v1/albums/" + $Id
 
-  try {
-    $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-    return $Response
-  } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-Album"
-  }
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
+  return $Response
 }

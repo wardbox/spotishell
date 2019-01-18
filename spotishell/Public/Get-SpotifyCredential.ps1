@@ -39,10 +39,14 @@ function  Get-SpotifyCredential {
   <# Construct filepath #>
   $CredentialFilePath = $CredentialStorePath + $Name + ".json"
 
-  $ExistingCredential = Get-Item -Path $CredentialFilePath -ErrorAction SilentlyContinue
+  $ExistingCredential = Get-Content -Path $CredentialFilePath -ErrorAction SilentlyContinue | ConvertFrom-Json
 
   if ($ExistingCredential) {
-    $Credential = Get-Content $ExistingCredential | ConvertFrom-Json -ErrorAction Stop
+    $Credential = @{
+      name         = $Name
+      ClientId     = $ExistingCredential.ClientId
+      ClientSecret = $ExistingCredential.ClientSecret
+    }
     return $Credential
   } else {
     Write-Warning "No credential found with name $Name"
