@@ -1,5 +1,5 @@
 function Get-MultipleAudioFeatures {
-    <#
+  <#
   .SYNOPSIS
     Fetches data for multiple tracks
   .DESCRIPTION
@@ -10,41 +10,37 @@ function Get-MultipleAudioFeatures {
   .PARAMETER TrackArray
   An array of no greater than 100 track Ids
   #>
-    param(
-        # The array of track Ids
-        [Parameter(Mandatory)]
-        [array]
-        $TrackArray
-    )
+  param(
+    # The array of track Ids
+    [Parameter(Mandatory)]
+    [array]
+    $TrackArray
+  )
 
-    if ($TrackArray.Count -gt 100) {
-        Write-Warning "Can't get more than 100 at a time."
-        break
+  if ($TrackArray.Count -gt 100) {
+    Write-Warning "Can't get more than 100 at a time."
+    break
+  }
+
+  $ConstructedTrackIds = ""
+
+  # Construct Id string
+  $Count = $TrackArray.Count
+  Write-Verbose "There are $Count track Ids to check"
+  foreach ($TrackId in $TrackArray) {
+    if ($Count -gt 1) {
+      $ConstructedTrackIds += "$TrackId%2C"
+    } else {
+      $ConstructedTrackIds += $TrackId
     }
+    $Count--
+  }
 
-    $ConstructedTrackIds = ""
+  $Query = "?ids=" + $ConstructedTrackIds
 
-    # Construct Id string
-    $Count = $TrackArray.Count
-    Write-Verbose "There are $Count track Ids to check"
-    foreach ($TrackId in $TrackArray) {
-        if ($Count -gt 1) {
-            $ConstructedTrackIds += "$TrackId%2C"
-        } else {
-            $ConstructedTrackIds += $TrackId
-        }
-        $Count--
-    }
+  $Method = "Get"
+  $Uri = "https://api.spotify.com/v1/audio-features" + $Query
 
-    $Query = "?ids=" + $ConstructedTrackIds
-
-    $Method = "Get"
-    $Uri = "https://api.spotify.com/v1/audio-features" + $Query
-
-    try {
-        $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-        return $Response
-    } catch {
-        Write-Warning "Failed sending Spotify API call for function Get-MultipleAudioFeatures"
-    }
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
+  return $Response
 }

@@ -8,7 +8,7 @@ function Get-MultipleAlbums {
     PS C:\> Get-MultipleAlbums -AlbumArray @("id1","id2")
     Grabs album data for album Ids "id1" and "id2" and returns them in an object
   .PARAMETER AlbumArray
-  An array of no greater than 20 album Ids
+    An array of no greater than 20 album Ids
   #>
   param(
     # The array of album Ids
@@ -43,5 +43,4 @@ function Get-MultipleAlbums {
 
   $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
   return $Response.albums
-
 }

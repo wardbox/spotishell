@@ -6,9 +6,9 @@ function Get-UserTopTracks {
     PS C:\> Get-UserTopTracks -Range "long"
     Gets top tracks for user over several years
   .PARAMETER Range
-  Long (calculated from several years of data and including all new data as it becomes available)
-  Medium (approximately last 6 months)
-  Short (approximately last 4 weeks)
+    Long (calculated from several years of data and including all new data as it becomes available)
+    Medium (approximately last 6 months)
+    Short (approximately last 4 weeks)
   #>
   param (
     # Username of person we want top tracks for
@@ -39,18 +39,15 @@ function Get-UserTopTracks {
     Authorization = "Bearer $($AccessToken.access_token)"
   }
 
-  try {
-    $Response = Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -ErrorAction Stop
-    if ($Response.next) {
-      $ResponseArray = @()
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -ErrorAction Stop
+  if ($Response.next) {
+    $ResponseArray = @()
+    $ResponseArray += $Response
+    while ($Response.next) {
+      $Response = Send-SpotifyCall -Method $Method -Uri $Response.next -Header $Auth -ErrorAction Stop
       $ResponseArray += $Response
-      while ($Response.next) {
-        $ResponseArray += Send-SpotifyCall -Method $Method -Uri $Response.next -Header $Auth -ErrorAction Stop
-      }
-      return $ResponseArray
     }
-    return $Response
-  } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-UserTopTracks"
+    return $ResponseArray
   }
+  return $Response
 }

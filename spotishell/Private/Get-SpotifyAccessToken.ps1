@@ -21,7 +21,7 @@ function Get-SpotifyAccessToken {
   )
 
   if ($IsMacOS -or $IsLinux) {
-    $SpotishellStore = $home + "/" + "/.wardbox/spotishell/"
+    $SpotishellStore = $home + "/.wardbox/spotishell/"
   } else {
     $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
   }

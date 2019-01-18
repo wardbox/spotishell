@@ -12,7 +12,6 @@ function Get-NewReleases {
   $Uri = "https://api.spotify.com/v1/browse/new-releases?limit=50"
   $Method = "Get"
 
-
   $Response = (Send-SpotifyCall -Method $Method -Uri $Uri).albums
   if ($Response.next) {
     # this is a bit messy for now, but shows the user that there were multiple calls that went above the API limit
@@ -27,5 +26,4 @@ function Get-NewReleases {
     return $Response
   }
   return $ResponseArray
-
 }

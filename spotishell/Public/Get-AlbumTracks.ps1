@@ -1,5 +1,5 @@
 function Get-AlbumTracks {
-    <#
+  <#
 .SYNOPSIS
     Gets album tracks.
 .DESCRIPTION
@@ -13,20 +13,16 @@ function Get-AlbumTracks {
 .NOTES
     Only returns a max of 50 tracks
 #>
-    param (
-        # Id of the album we want to get information on
-        [Parameter(Mandatory)]
-        [string]
-        $Id
-    )
-    Write-Verbose "Attempting to return info on album with Id $Id"
-    $Method = "Get"
-    $Uri = "https://api.spotify.com/v1/albums/" + $Id + "/tracks?limit=50"
+  param (
+    # Id of the album we want to get information on
+    [Parameter(Mandatory)]
+    [string]
+    $Id
+  )
+  Write-Verbose "Attempting to return info on album with Id $Id"
+  $Method = "Get"
+  $Uri = "https://api.spotify.com/v1/albums/" + $Id + "/tracks?limit=50"
 
-    try {
-        $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-        return $Response
-    } catch {
-        Write-Warning "Failed sending Spotify API call for function Get-AlbumTracks"
-    }
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
+  return $Response
 }

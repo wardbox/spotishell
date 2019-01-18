@@ -14,5 +14,4 @@ function Get-RecommendationGenres {
 
   $Response = Send-SpotifyCall -Method $Method -Uri $Uri
   return $Response.genres
-
 }

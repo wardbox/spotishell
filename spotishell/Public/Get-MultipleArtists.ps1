@@ -8,7 +8,7 @@ function Get-MultipleArtists {
     PS C:\> Get-MultipleArtists -ArtistArray @("id1","id2")
     Grabs artist data for artist Ids "id1" and "id2" and returns them in an object
   .PARAMETER ArtistArray
-  An array of no greater than 50 artist Ids
+    An array of no greater than 50 artist Ids
   #>
   param(
     # The array of artist Ids
@@ -41,10 +41,6 @@ function Get-MultipleArtists {
   $Method = "Get"
   $Uri = "https://api.spotify.com/v1/artists" + $Query
 
-  try {
-    $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-    return $Response
-  } catch {
-    Write-Warning "Failed sending Spotify API call for function Get-MultipleArtists"
-  }
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
+  return $Response
 }

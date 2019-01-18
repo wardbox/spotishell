@@ -1,30 +1,26 @@
 function Get-AudioFeature {
-    <#
-.SYNOPSIS
+  <#
+  .SYNOPSIS
     Gets features for a track.
-.DESCRIPTION
+  .DESCRIPTION
     Get audio feature information for a single track identified by its unique Spotify ID.
-.EXAMPLE
+  .EXAMPLE
     PS C:\> Get-AudioFeature -Id "blahblahblah"
     Retrieves audio features for a track from spotify with the Id of "blahblahblah"
-.PARAMETER Id
+  .PARAMETER Id
     The spotify Id of the track we want to look up
-#>
-    param (
-        # Id of the track we want to look up
-        [Parameter(Mandatory)]
-        [string]
-        $Id
-    )
+  #>
+  param (
+    # Id of the track we want to look up
+    [Parameter(Mandatory)]
+    [string]
+    $Id
+  )
 
-    Write-Verbose "Attempting to return info on track with Id $Id"
-    $Method = "Get"
-    $Uri = "https://api.spotify.com/v1/audio-features/" + $Id
+  Write-Verbose "Attempting to return info on track with Id $Id"
+  $Method = "Get"
+  $Uri = "https://api.spotify.com/v1/audio-features/" + $Id
 
-    try {
-        $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-        return $Response
-    } catch {
-        Write-Warning "Failed sending Spotify API call for function Get-AudioFeature"
-    }
+  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
+  return $Response
 }
