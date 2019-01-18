@@ -20,11 +20,11 @@ function Set-SpotifyCredential {
         $Name
     )
 
-  if ($IsMacOS -or $IsLinux) {
-    $CredentialStorePath = $home + "/.wardbox/spotishell/credential/"
-  } else {
-    $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
-  }
+    if ($IsMacOS -or $IsLinux) {
+        $CredentialStorePath = $home + "/.wardbox/spotishell/credential/"
+    } else {
+        $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
+    }
 
     # If we don't have a credential store, tell user to make one
     if (!(Test-Path -Path $CredentialStorePath)) {
