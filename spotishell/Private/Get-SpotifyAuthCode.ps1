@@ -22,7 +22,8 @@ function Get-SpotifyAuthCode {
     "user-modify-playback-state",
     "user-read-currently-playing",
     "user-read-playback-state",
-    "user-top-read",
+    <#commenting out user-top-read as it makes the module fail, works without this on win10 pwsh 7 #>
+    <#"user-top-read",#>
     "user-read-recently-played",
     "app-remote-control",
     "streaming",
