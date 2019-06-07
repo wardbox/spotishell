@@ -30,11 +30,14 @@ Get-Command -Module Spotishell
 ```powershell
 New-SpotifyCredential -Name "appname" -ClientId "blahblahblah" -ClientSecret "blahblahblahblah"
 ```
-5. Give it a whirl!
+5. Add "http://localhost/spotifyapi" as a redirect URL in your Spotify app settings
+[spotify developer Dashboard](https://developer.spotify.com/dashboard)
+
+6. Give it a whirl!
 ```powershell
 Search-Spotify -Query "Bloc Party" -Artist
 ```
-6. Enjoy the bountiful data :^)
+7. Enjoy the bountiful data :^)
 
 ```
 "Music is the silence between the notes"
