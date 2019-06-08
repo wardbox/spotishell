@@ -6,7 +6,7 @@ function Invoke-SkipSong {
       PS C:\> Invoke-Skipsong -Username "blahblah"
       Skips to next song for user with username "blahblah"
     .PARAMETER Username
-      Username of the spotify user we want to resume playback for
+      Username of the spotify user we want to skip playback for
     .PARAMETER DeviceId
       The id of the device this command is targeting.
       If not supplied, the user's currently active device is the target.
