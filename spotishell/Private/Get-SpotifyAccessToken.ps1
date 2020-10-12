@@ -111,7 +111,7 @@ function Get-SpotifyAccessToken {
         $AccessTokenJSON = @{
           access_token = $Response."access_token";
           token_type   = $Response."token_type";
-          expires      = "$Expires";
+          expires      = Get-Date $Expires -Format 'u';
           scope        = $Response."scope";
         }
         $AccessTokenJSON | ConvertTo-Json -Depth 100 | Out-File -FilePath $AccessTokenFilePath
