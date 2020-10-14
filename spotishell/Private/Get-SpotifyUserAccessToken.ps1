@@ -57,7 +57,7 @@ function Get-SpotifyUserAccessToken {
   }
 
   if ($ExistingAccessToken) {
-    $Expires = $ExistingAccessToken.expires_in | Get-Date
+    $Expires = [DateTime]::ParseExact($ExistingAccessToken.expires_in,'u',$null)
     $CurrentTime = Get-Date
     if ($CurrentTime -le $Expires.AddSeconds(-10)) {
       return $ExistingAccessToken
@@ -119,7 +119,7 @@ function Get-SpotifyUserAccessToken {
           access_token  = $Response."access_token"
           token_type    = $Response."token_type"
           scope         = $Response."scope"
-          expires_in    = $Expires
+          expires_in    = $Expires.ToString('u')
           refresh_token = $Response."refresh_token"
         }
         $UserAccessTokenJSON | ConvertTo-Json -Depth 100 | Out-File -FilePath $UserAccessTokenFilePath
