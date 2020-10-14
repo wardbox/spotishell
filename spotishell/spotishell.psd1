@@ -33,7 +33,7 @@
     Description       = 'A powershell module to interact with the Spotify API'
 
     # Minimum version of the Windows PowerShell engine required by this module
-    PowerShellVersion = '5.0'
+    PowerShellVersion = '6.0'
 
     # Name of the Windows PowerShell host required by this module
     # PowerShellHostName = ''
