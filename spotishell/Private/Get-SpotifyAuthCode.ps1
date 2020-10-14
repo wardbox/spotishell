@@ -54,14 +54,18 @@ function Get-SpotifyAuthCode {
     # opens the constructed uri in default browser on mac
     Write-Verbose "We are on Mac OS"
     open $URI
-  } elseif ($IsWindows) {
+  }
+  elseif ($IsLinux) {
+    throw 'Authorization Code Flow is not supported on Linux'
+  }
+  else { #so we are on Windows
     Write-Verbose "We are on Windows"
     rundll32 url.dll,FileProtocolHandler $URI
   }
 
   $Response = Read-Host "Paste the entire URL that it redirects you to"
-  $Response = $Response.Split("spotifyapi?")[1]
-  $SplitResponse = $Response.Split("&state=")
+  $Response = ($Response -Split 'spotifyapi?')[1]
+  $SplitResponse = $Response -Split '&state='
   $Code = $SplitResponse[0]
   $ResponseGuid = $SplitResponse[1]
 
@@ -75,6 +79,6 @@ function Get-SpotifyAuthCode {
     Write-Warning "We didn't successfully retrieve an auth code.  This may be due to expired credentials or wardbox messed up."
     return $Code
   }
-  $Code = $Code.Replace("code=", "")
+  $Code = $Code.Replace("?code=", "")
   return $Code
 }
