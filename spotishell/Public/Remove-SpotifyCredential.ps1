@@ -17,9 +17,11 @@ function Remove-SpotifyCredential {
   )
 
   if ($IsMacOS -or $IsLinux) {
-    $CredentialStorePath = $home + "/.wardbox/spotishell/credential/"
+    $CredentialStorePath = Join-Path -Path $Home -ChildPath "/.wardbox/spotishell/credential/"
+    $AccessTokenStorePath = Join-Path -Path $Home -ChildPath "\wardbox\spotishell\access_token\"
   } else {
-    $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
+    $CredentialStorePath = Join-Path -Path $env:LOCALAPPDATA -ChildPath "\wardbox\spotishell\credential\"
+    $AccessTokenStorePath = Join-Path -Path $env:LOCALAPPDATA -ChildPath "\wardbox\spotishell\access_token\" 
   }
 
   # If we don't have a credential store, tell user to make one
@@ -27,6 +29,14 @@ function Remove-SpotifyCredential {
     Write-Warning "Failed attempting to create credential store at $CredentialStorePath"
     Write-Warning "Suggest running New-SpotifyCredential to create a credential first."
     break
+  }
+
+  if (Test-Path -Path $AccessTokenStorePath -ChildPath "$Name.json") {
+    try {
+      Remove-Item -Path $AccessTokenStorePath -ChildPath "$Name.json"
+    } catch {
+      Write-Warning "There's an accesstoken for $Name that has not been deleted at $AccessTokenStorePath\$Name.json"
+    }
   }
 
   Write-Verbose "Credential store exists at $CredentialStorePath"

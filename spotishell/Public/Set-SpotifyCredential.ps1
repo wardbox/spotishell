@@ -21,9 +21,9 @@ function Set-SpotifyCredential {
     )
 
     if ($IsMacOS -or $IsLinux) {
-        $CredentialStorePath = $home + "/.wardbox/spotishell/credential/"
+        $CredentialStorePath = Join-Path -Path $Home -ChildPath "/.wardbox/spotishell/credential/"
     } else {
-        $CredentialStorePath = $env:LOCALAPPDATA + "\wardbox\spotishell\credential\"
+        $CredentialStorePath = Join-Path -Path $env:LOCALAPPDATA -ChildPath "\wardbox\spotishell\credential\"
     }
 
     # If we don't have a credential store, tell user to make one
@@ -36,7 +36,7 @@ function Set-SpotifyCredential {
     Write-Verbose "Credential store exists at $CredentialStorePath"
 
     <# Construct filepath #>
-    $CredentialFilePath = $CredentialStorePath + $Name + ".json"
+    $CredentialFilePath = Join-Path -Path $CredentialStorePath -ChildPath "$Name.json"
 
     $ExistingCredential = Get-Item -Path $CredentialFilePath -ErrorAction SilentlyContinue
 

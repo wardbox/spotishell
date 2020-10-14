@@ -21,9 +21,9 @@ function Get-SpotifyAccessToken {
   )
 
   if ($IsMacOS -or $IsLinux) {
-    $SpotishellStore = $home + "/.wardbox/spotishell/"
+    $SpotishellStore = Join-Path -Path $Home -ChildPath "/.wardbox/spotishell/"
   } else {
-    $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
+    $SpotishellStore = Join-Path -Path $env:LOCALAPPDATA -ChildPath "\wardbox\spotishell\"
   }
 
   $AccessTokenStorePath = $SpotishellStore + "access_token\"
@@ -99,6 +99,7 @@ function Get-SpotifyAccessToken {
     $CurrentTime = Get-Date
   } catch {
     Write-Warning "Failed sending request to API to get access token."
+    Write-Warning $Error[0]
     break
   }
 

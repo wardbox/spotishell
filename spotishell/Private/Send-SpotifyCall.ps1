@@ -40,13 +40,13 @@ function Send-SpotifyCall {
   )
 
   if ($IsMacOS -or $IsLinux) {
-    $SpotishellStore = $home + "/.wardbox/spotishell/"
+    $SpotishellStore = Join-Path -Path $Home -ChildPath "/.wardbox/spotishell/"
   } else {
-    $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
+    $SpotishellStore = Join-Path -Path $env:LOCALAPPDATA -ChildPath "\wardbox\spotishell\"
   }
 
   $CredentialStorePath = $SpotishellStore + "credential\"
-  $CredentialName = Get-Content -Path ($CredentialStorePath + "current.txt")
+  $CredentialName = Get-Content -Path "$CredentialStorePath\current.txt"
 
   if ($CredentialName) {
 
