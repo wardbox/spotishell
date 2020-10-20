@@ -13,7 +13,7 @@ function Get-SpotifyAuthCode {
   }
   $ClientId = "client_id=" + $Credential.clientid
   $ResponseType = "response_type=code"
-  $RedirectURI = "redirect_uri=http%3A%2F%2Flocalhost%2Fspotifyapi"
+  $RedirectURI = "redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fspotifyapi"
   $Scopes = @(
     "playlist-read-private",
     "playlist-modify-private",
@@ -34,21 +34,25 @@ function Get-SpotifyAuthCode {
     "user-library-modify",
     "user-library-read"
   )
-  $UriScopes = "scope="
-  $Count = $Scopes.Count
-  foreach ($Scope in $Scopes) {
-    if ($Count -gt 1) {
-      $UriScopes += "$Scope%20"
-    } else {
-      $UriScopes += "$Scope"
-    }
-    $Count--
-  }
+  $UriScopes = "scope=" + ($Scopes -join '%20')
   $BaseURI = "https://accounts.spotify.com/authorize?"
   $Guid = [guid]::NewGuid()
   Write-Verbose "Using GUID $Guid"
   $URI = $BaseURI + $ClientId + "&" + $ResponseType + "&" + $RedirectURI + "&" + $UriScopes + "&state=$Guid"
   Write-Verbose "Using URI $URI"
+
+  # Create an Http Server
+  $Listener = [System.Net.HttpListener]::new() 
+  $Listener.Prefixes.Add("http://localhost:8080/")
+  $Listener.Start()
+  if ($Listener.IsListening) {
+    Write-Verbose "HTTP Server is ready to receive AuthCode."
+    $HttpServerReady = $true
+  }
+  else {
+    Write-Verbose "HTTP Server is not ready. Fall back to manual method"
+    $HttpServerReady = $false
+  }
 
   if ($IsMacOS) {
     # opens the constructed uri in default browser on mac
@@ -63,7 +67,38 @@ function Get-SpotifyAuthCode {
     rundll32 url.dll,FileProtocolHandler $URI
   }
 
+  if ($httpServerReady) {
+    Write-Host 'Waiting 30sec for authorization acceptance'
+    $Task = $null
+    $StartTime = Get-Date
+    while ($Listener.IsListening -and ((Get-Date) - $StartTime) -lt '0.00:00:30' ) {
+
+      if ($null -eq $Task) {
+        $task = $Listener.GetContextAsync()
+  }
+
+      if ($Task.IsCompleted) {
+        $Context = $task.Result
+        $Task = $null
+        $Response = $context.Request.Url
+        $ContextResponse = $context.Response
+
+        [string]$html = '<script>close()</script>Thanks! You can close this window now.'
+
+        $htmlBuffer = [System.Text.Encoding]::UTF8.GetBytes($html) # convert htmtl to bytes
+
+        $ContextResponse.ContentLength64 = $htmlBuffer.Length
+        $ContextResponse.OutputStream.Write($htmlBuffer, 0, $htmlBuffer.Length)
+        $ContextResponse.OutputStream.Close()
+        $Listener.Stop()
+        break;
+      }
+    }
+  }
+  else {
   $Response = Read-Host "Paste the entire URL that it redirects you to"
+  }
+
   $Response = ($Response -Split 'spotifyapi?')[1]
   $SplitResponse = $Response -Split '&state='
   $Code = $SplitResponse[0]
