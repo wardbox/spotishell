@@ -24,22 +24,18 @@ function Get-Recommendations {
   #>
   param (
     # Our seed artist spotify Ids
-    [Parameter(Mandatory = $false)]
     [array]
     $SeedArtists,
 
     # Our seed genres
-    [Parameter(Mandatory = $false)]
     [array]
     $SeedGenres,
 
     # Our seed track spotify Ids
-    [Parameter(Mandatory = $false)]
     [array]
     $SeedTracks,
 
     # The filters we want to apply
-    [Parameter(Mandatory = $false)]
     [array]
     $Filters
   )

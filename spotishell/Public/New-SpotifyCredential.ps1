@@ -21,19 +21,19 @@ function  New-SpotifyCredential {
     param (
         <# Credential name so user can identify it #>
         # Parameter help description
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [String]
         $Name,
 
         <# Client ID, obtained from one of your applications on the Spotify developer dashboard:
     https://developer.spotify.com/dashboard/applications (as of this writing) #>
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [String]
         $ClientId,
 
         <# Client Secret, obtained from one of your applications on the Spotify developer dashboard:
     https://developer.spotify.com/dashboard/applications (as of this writing) #>
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [String]
         $ClientSecret
     )

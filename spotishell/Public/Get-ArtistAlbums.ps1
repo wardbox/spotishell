@@ -20,22 +20,18 @@ function Get-ArtistAlbums {
     $ArtistId,
 
     # Choose to look up albums
-    [Parameter(Mandatory = $false)]
     [switch]
     $Album,
 
     # Choose to look up singles
-    [Parameter(Mandatory = $false)]
     [switch]
     $Single,
 
     # Choose to look up appears on
-    [Parameter(Mandatory = $false)]
     [switch]
     $AppearsOn,
 
     # Choose to look up compilations
-    [Parameter(Mandatory = $false)]
     [switch]
     $Compilation
   )

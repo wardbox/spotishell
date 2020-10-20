@@ -28,26 +28,22 @@ function Search-Spotify {
   #>
   param (
     # The data we want to look for
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     $Query,
 
     # Artist switch
-    [Parameter(Mandatory = $false)]
     [switch]
     $Artist,
 
     # Album switch
-    [Parameter(Mandatory = $false)]
     [switch]
     $Album,
 
     # Track switch
-    [Parameter(Mandatory = $false)]
     [switch]
     $Track,
 
     # Playlist switch
-    [Parameter(Mandatory = $false)]
     [switch]
     $Playlist
 

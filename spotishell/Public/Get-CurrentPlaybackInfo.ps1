@@ -11,9 +11,8 @@ function Get-CurrentPlaybackInfo {
   #>
   param(
     # Username
-    [Parameter(Mandatory)]
     [String]
-    $Username
+    $Username = 'default'
   )
   Write-Verbose "Attempting to return current playback for you"
   $Method = "Get"
