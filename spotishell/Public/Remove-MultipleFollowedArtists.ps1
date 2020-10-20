@@ -1,7 +1,7 @@
 function Remove-MultipleFollowedArtists {
     <#
   .SYNOPSIS
-    Unfollow multiple new Artists
+    Unfollow multiple Artists
   .EXAMPLE
     PS C:\> Remove-MultipleFollowedArtists -Username "xyz" -ArtistArray @("id1","id2")
     Remove artists with Ids "id1" and "id2" to follow for the user authed under the current access token

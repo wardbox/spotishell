@@ -1,5 +1,5 @@
 function Test-MultipleFollowedArtists {
-    <#
+  <#
     .SYNOPSIS
       Check if current user follows some Artists
     .EXAMPLE
@@ -11,29 +11,29 @@ function Test-MultipleFollowedArtists {
     .PARAMETER ArtistArray
       An array of no greater than 50 artist Ids
     #>
-    param (
-        # UserAccessToken
-        [Parameter(Mandatory)]
-        [String]
-        $Username,
-        # The array of artist Ids
-        [Parameter(Mandatory)]
-        [array]
-        $ArtistArray
-    )
+  param (
+    # UserAccessToken
+    [Parameter(Mandatory)]
+    [String]
+    $Username,
+    # The array of artist Ids
+    [Parameter(Mandatory)]
+    [array]
+    $ArtistArray
+  )
   
-    if ($ArtistArray.Count -gt 50) {
-        Write-Warning "Can't follow more than 50 at a time."
-        break
-    }
+  if ($ArtistArray.Count -gt 50) {
+    Write-Warning "Can't follow more than 50 at a time."
+    break
+  }
 
-    Write-Verbose "Checking follow of those artists"
-    $Method = "Get"
-    $Uri = "https://api.spotify.com/v1/me/following/contains?type=artist&ids=$($ArtistArray -join '%2C')"
-    $AccessToken = Get-SpotifyUserAccessToken -Username $Username
-    $Auth = @{
-        Authorization = "Bearer $($AccessToken.access_token)"
-    }
+  Write-Verbose "Checking follow of those artists"
+  $Method = "Get"
+  $Uri = "https://api.spotify.com/v1/me/following/contains?type=artist&ids=$($ArtistArray -join '%2C')"
+  $AccessToken = Get-SpotifyUserAccessToken -Username $Username
+  $Auth = @{
+    Authorization = "Bearer $($AccessToken.access_token)"
+  }
   
-    Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -ErrorAction Stop
+  Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -ErrorAction Stop
 }
