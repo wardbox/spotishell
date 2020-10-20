@@ -80,7 +80,7 @@ function Get-SpotifyUserAccessToken {
       $Body = @{
         "grant_type"   = "authorization_code"
         "code"         = $AuthCode
-        "redirect_uri" = "http://localhost/spotifyapi"
+        "redirect_uri" = "http://localhost:8080/spotifyapi"
       }
     } else {
       $Body = @{
