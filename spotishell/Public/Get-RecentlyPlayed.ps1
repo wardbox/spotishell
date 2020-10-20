@@ -14,9 +14,8 @@ function Get-RecentlyPlayed {
     A track must be played for more than 30 seconds to be included in play history.
   #>
   param(
-    [Parameter(Mandatory)]
     [String]
-    $Username
+    $Username = 'default'
   )
   $Limit = "50"
   Write-Verbose "Attempting to return recently played tracks for user $Username"

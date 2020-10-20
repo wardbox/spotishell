@@ -12,12 +12,10 @@ function Get-UserTopArtists {
   #>
   param (
     # Username of person we want top artists for
-    [Parameter(Mandatory)]
     [String]
-    $Username,
+    $Username = 'default',
 
     # Determines how far back we look
-    [Parameter(Mandatory = $false)]
     [String]
     [ValidateSet("long", "medium", "short")]
     $Range

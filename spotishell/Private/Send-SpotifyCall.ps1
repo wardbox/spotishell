@@ -20,22 +20,20 @@ function Send-SpotifyCall {
   param (
 
     # This is our method
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $Method,
 
     # URI to api endpoint
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $Uri,
 
     # This is the header constructed by previous function.  Typically contains the access token
-    [Parameter(Mandatory = $false)]
     [hashtable]
     $Header,
 
     # Body for call, typically contains sporadic values.
-    [Parameter(Mandatory = $false)]
     $Body
   )
 

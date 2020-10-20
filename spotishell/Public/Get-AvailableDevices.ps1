@@ -7,9 +7,8 @@ function Get-AvailableDevices {
   #>
   param(
     # Username
-    [Parameter(Mandatory)]
     [string]
-    $Username
+    $Username = 'default'
   )
 
   Write-Verbose "Attempting to return available devices for user with username $Username"

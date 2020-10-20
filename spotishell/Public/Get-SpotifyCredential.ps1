@@ -14,7 +14,6 @@ function  Get-SpotifyCredential {
   param (
     <# Credential name so user can identify it #>
     # Parameter help description
-    [Parameter(Mandatory = $false)]
     [String]
     $Name
   )

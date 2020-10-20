@@ -12,12 +12,10 @@ function Get-UserTopTracks {
   #>
   param (
     # Username of person we want top tracks for
-    [Parameter(Mandatory)]
     [String]
-    $Username,
+    $Username = 'default',
 
     # Determines how far back we look
-    [Parameter(Mandatory = $false)]
     [String]
     [ValidateSet("long", "medium", "short")]
     $Range

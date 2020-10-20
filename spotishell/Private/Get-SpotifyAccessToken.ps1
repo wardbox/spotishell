@@ -15,7 +15,7 @@ function Get-SpotifyAccessToken {
   [CmdletBinding()]
   param (
     <# This is the name of the credential you want to use #>
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [String]
     $Name
   )

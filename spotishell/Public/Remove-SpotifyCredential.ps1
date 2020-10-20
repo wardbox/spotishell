@@ -11,7 +11,7 @@ function Remove-SpotifyCredential {
   #>
   param(
     # Name of our credential
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $Name
   )
