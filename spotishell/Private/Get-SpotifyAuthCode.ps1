@@ -1,7 +1,6 @@
 function Get-SpotifyAuthCode {
   param (
     # The name of the spotify credentials we've saved
-    [Parameter(Mandatory = $false)]
     [string]
     $Name
   )

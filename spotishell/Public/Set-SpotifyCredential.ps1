@@ -15,7 +15,7 @@ function Set-SpotifyCredential {
   #>
     param(
         # Name of our credential we've created
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $Name
     )

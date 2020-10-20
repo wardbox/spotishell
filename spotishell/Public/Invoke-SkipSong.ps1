@@ -17,22 +17,18 @@ function Invoke-SkipSong {
     #>
     param (
       # Username
-      [Parameter(Mandatory)]
-      [string]
-      $Username,
+    [String]
+    $Username = 'default',
   
       # Device ID that we want to resume playback on
-      [Parameter(Mandatory = $false)]
       [array]
       $DeviceId,
   
       # Spotify URI of the context to play
-      [Parameter(Mandatory = $false)]
       [string]
       $ContextUri,
   
       # An array of the Spotify track URIs to play
-      [Parameter(Mandatory = $false)]
       [Array]
       $TrackUris
     )

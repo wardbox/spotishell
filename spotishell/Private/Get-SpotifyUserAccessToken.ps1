@@ -15,9 +15,8 @@ function Get-SpotifyUserAccessToken {
   [CmdletBinding()]
   param (
     # Spotify username
-    [Parameter(Mandatory = $true)]
     [String]
-    $Username
+    $Username = 'default'
   )
 
   if ($IsMacOS -or $IsLinux) {

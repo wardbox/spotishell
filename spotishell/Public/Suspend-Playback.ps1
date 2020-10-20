@@ -13,12 +13,10 @@ function Suspend-Playback {
   #>
   param (
     # Username
-    [Parameter(Mandatory)]
-    [string]
-    $Username,
+    [String]
+    $Username = 'default',
 
     # Device ID that we want to pause playback on
-    [Parameter(Mandatory = $false)]
     [array]
     $DeviceId
   )
