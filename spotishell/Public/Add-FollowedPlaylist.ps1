@@ -22,14 +22,14 @@ function Add-FollowedPlaylist {
     $Id,
     # If true the playlist will be included in user’s public playlists, if false it will remain private.
     [bool]
-    $public = $false
+    $public = $true
   )
   Write-Verbose "Attempting to follow this playlist"
   $Method = "Put"
   $Uri = "https://api.spotify.com/v1/playlists/$Id/followers"
   $AccessToken = Get-SpotifyUserAccessToken -Username $Username
   $Auth = @{Authorization = "Bearer $($AccessToken.access_token)" }
-  $Body = @{"public" = $public.ToString() }
+  $Body = ConvertTo-Json -InputObject @{"public" = $public.ToString() }
 
   Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -Body $Body -ErrorAction Stop | Out-Null
 }
