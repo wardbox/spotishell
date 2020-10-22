@@ -28,9 +28,9 @@ Get-Command -Module Spotishell
 ```
 4. Set up your credential (use keys from your registered app referenced in the prerequisites)
 ```powershell
-New-SpotifyCredential -Name "appname" -ClientId "blahblahblah" -ClientSecret "blahblahblahblah"
+New-SpotifyApplication -ClientId "blahblahblah" -ClientSecret "blahblahblahblah"
 ```
-5. Add "http://localhost:8080/spotifyapi" as a redirect URL in your Spotify app settings
+5. Add "http://localhost:8080/spotishell" as a redirect URL in your Spotify app settings
 [spotify developer Dashboard](https://developer.spotify.com/dashboard)
 
 6. Give it a whirl!

@@ -6,7 +6,7 @@ SHORT DESCRIPTION
 
 EXAMPLES
     Search-Spotify -Query "Bloc Party" -Artist
-    New-SpotifyCredential -Name "blah" -ClientId "myclientId" -ClientSecret "myClientSecret"
+    New-SpotifyApplication -Name "blah" -ClientId "myclientId" -ClientSecret "myClientSecret"
 
 KEYWORDS
     spotify, spotify-api, api, core, mac, linux
