@@ -1,134 +1,243 @@
+<#
+    .SYNOPSIS
+        Gets a Spotify access token
+    .DESCRIPTION
+        Gets a Spotify access token using defined SpotifyApplication
+        It follows the Authorization Code Flow (https://developer.spotify.com/documentation/general/guides/authorization-guide/#authorization-code-flow)
+    .EXAMPLE
+        PS C:\> Get-SpotifyAccessToken -ApplicationName 'dev'
+        Looks for a saved credential named "dev" and tries to get an access token with it's credentials
+    .PARAMETER ApplicationName
+        Specifies the Spotify Application Name (otherwise default is used)
+#>
 function Get-SpotifyAccessToken {
-  <#
-  .SYNOPSIS
-    Gets a spotify access token
-  .DESCRIPTION
-    Gets a spotify access token by talking to the API and sending clientId and clientSecret
-  .EXAMPLE
-    PS C:\> Get-SpotifyAccessToken -Name "dev"
-    Looks for a saved credential named "dev" and tries to get an access token with it's credentials
-  .PARAMETER Name
-    Is a string, should be the name of your credential
-  .OUTPUTS
-    This will output the credential object
-  #>
-  [CmdletBinding()]
-  param (
-    <# This is the name of the credential you want to use #>
-    [Parameter(Mandatory)]
-    [String]
-    $Name
-  )
 
-  if ($IsMacOS -or $IsLinux) {
-    $SpotishellStore = $home + "/.wardbox/spotishell/"
-  } else {
-    $SpotishellStore = $env:LOCALAPPDATA + "\wardbox\spotishell\"
-  }
+    [CmdletBinding()]
+    param (
+        [String]
+        $ApplicationName
+    )
 
-  $AccessTokenStorePath = $SpotishellStore + "access_token\"
-  $AccessTokenFilePath = $AccessTokenStorePath + $Name + ".json"
-  #$CredentialStorePath = $SpotishellStore + "credential\"
+    # Get Application from the Store
+    $Application = Get-SpotifyApplication -Name $ApplicationName
 
-  <# Check if we have a valid access token already #>
-  if (!(Test-Path -Path $AccessTokenStorePath)) {
-    <# There is no access token store, let's try to make one. #>
-    try {
-      Write-Verbose "Attempting to create access token store at $AccessTokenStorePath"
-      New-Item -Path $AccessTokenStorePath -ItemType Directory -ErrorAction Stop
-      Write-Verbose "Successfully created access token store at $AccessTokenStorePath"
-    } catch {
-      Write-Warning "Failed attempting to create access token store at $AccessTokenStorePath"
-      Write-Warning "Check error for more details."
-      break
-    }
-  }
+    # If Token is available
+    if ($Application.Token) {
 
-  Write-Verbose "Access token store exists at $AccessTokenStorePath"
-
-  try {
-    Write-Verbose "Attempting to read access token from $AccessTokenFilePath"
-    $ExistingAccessToken = Get-Content -Path $AccessTokenFilePath -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction Stop
-  } catch {
-    Write-Warning "Couldn't convert existing access token from JSON"
-    break
-  }
-
-  if ($ExistingAccessToken) {
-    $Expires = [DateTime]::ParseExact($ExistingAccessToken.expires,'u',$null)
-    $CurrentTime = Get-Date
-    if ($CurrentTime -le $Expires.AddSeconds(-10)) {
-      return $ExistingAccessToken
-    }
-  }
-
-  try {
-    $SpotifyCredentials = Get-SpotifyCredential -Name $Name -ErrorAction Stop
-  } catch {
-    Write-Warning "Couldn't find spotify credentials with name $Name"
-    break
-  }
-
-  if ($SpotifyCredentials.ClientId -and $SpotifyCredentials.ClientSecret) {
-    <# The request is sent to the /api/token endpoint of the Accounts service:
-    POST https://accounts.spotify.com/api/token #>
-    $Uri = "https://accounts.spotify.com/api/token"
-    $Method = "Post"
-
-    <# The body of this POST request must contain the following parameters encoded
-    in application/x-www-form-urlencoded as defined in the OAuth 2.0 specification #>
-    $Body = @{
-      "grant_type" = "client_credentials"
-    }
-
-  } else {
-    $SpotifyCredentials = New-SpotifyCredential -Name $Name -ClientId (Read-Host -Prompt "ClientId") -ClientSecret (Read-Host "ClientSecret")
-  }
-
-  <# Base 64 encoded string that contains the client ID and client secret key. #>
-  $CombinedCredentials = [System.Text.Encoding]::UTF8.GetBytes($SpotifyCredentials.ClientId + ":" + $SpotifyCredentials.ClientSecret)
-  $Base64Credentials = [System.Convert]::ToBase64String($CombinedCredentials)
-  $Auth = @{
-    "Authorization" = "Basic " + $Base64Credentials
-  }
-
-  <# Call api for auth token #>
-  try {
-    Write-Verbose "Attempting to send request to API to get access token."
-    $Response = Invoke-WebRequest -Uri $Uri -Method $Method -Body $Body -Headers $Auth
-    $CurrentTime = Get-Date
-  } catch {
-    Write-Warning "Failed sending request to API to get access token."
-    break
-  }
-
-  if ($Response) {
-    Write-Verbose "We got a response!"
-    if ($Response.StatusCode -eq "200") {
-      $Response = $Response.Content | ConvertFrom-Json
-      try {
-        $Expires = $CurrentTime.AddSeconds($Response."expires_in")
-        $AccessTokenJSON = @{
-          access_token = $Response."access_token";
-          token_type   = $Response."token_type";
-          expires      = $Expires.ToString('u');
-          scope        = $Response."scope";
+        # Check that Access Token is not expired
+        $Expires = [DateTime]::ParseExact($Application.Token.Expires, 'u', $null)
+        if ((Get-Date) -le $Expires.AddSeconds(-10)) {
+            # Access Token is still valid, then use it
+            return $Application.Token.access_token
         }
-        $AccessTokenJSON | ConvertTo-Json -Depth 100 | Out-File -FilePath $AccessTokenFilePath
-        Write-Verbose "Successfully saved access token to $AccessTokenFilePath"
-        $AccessTokenObject = Get-Content $AccessTokenFilePath | ConvertFrom-Json -ErrorAction Stop
-        return $AccessTokenObject
-      } catch {
-        Write-Warning "Failed saving access token to $AccessTokenFilePath"
-      }
-    } else {
-      Write-Warning "We got a bad response."
-      Write-Warning "$($Response.StatusCode)"
-      Write-Warning "$($Response.StatusDescription)"
-      break
+        else {
+            # Access Token is expired, need to be refreshed
+            
+            # ------------------------------ Token Refreshed retrieval ------------------------------
+            # STEP 1 : Prepare
+            $Uri = 'https://accounts.spotify.com/api/token'
+            $Method = 'Post'
+            $Body = @{
+                grant_type    = 'refresh_token'
+                refresh_token = $Application.Token.refresh_token
+                client_id     = $Application.ClientId # alternative way to send the client id and secret
+                client_secret = $Application.ClientSecret # alternative way to send the client id and secret
+            }
+
+            # STEP 2 : Make request to the Spotify Accounts service
+            try {
+                Write-Verbose "Send request to refresh access token."
+                $CurrentTime = Get-Date
+                $Response = Invoke-WebRequest -Uri $Uri -Method $Method -Body $Body
+            }
+            catch {
+                Throw "Error occured during request of refreshed access token : $($PSItem[0].ToString())"
+            }
+
+            # STEP 3 : Parse and save response
+            $ResponseContent = $Response.Content | ConvertFrom-Json
+
+            $Token = @{
+                access_token  = $ResponseContent.access_token
+                token_type    = $ResponseContent.token_type
+                scope         = $ResponseContent.scope
+                expires       = $CurrentTime.AddSeconds($ResponseContent.expires_in).ToString('u')
+                refresh_token = if ($ResponseContent.refresh_token) { $ResponseContent.refresh_token } else { $Application.Token.refresh_token }
+            }
+
+            Set-SpotifyApplication -Name $ApplicationName -Token $Token
+            Write-Verbose 'Successfully saved Refreshed Token'
+
+            return $Token.access_token
+
+        }
     }
-  } else {
-    Write-Warning "No response!"
-    break
-  }
+
+    # Starting this point, neither valid access token were found nor successful refresh were done
+    # So we start Authorization Code Flow from zero
+
+    # ------------------------------ Authorization Code retrieval ------------------------------
+    # STEP 1 : Prepare
+    $EncodedRedirectUri = [System.Web.HTTPUtility]::UrlEncode($Application.RedirectUri)
+    $EncodedScopes = @( # requesting all existing scopes
+        'ugc-image-upload',
+        'playlist-modify-public',
+        'playlist-read-private',
+        'playlist-modify-private',
+        'playlist-read-collaborative',
+        'app-remote-control',
+        'streaming',
+        'user-read-playback-position',
+        'user-read-recently-played',
+        'user-top-read',
+        'user-follow-modify',
+        'user-follow-read',
+        'user-read-playback-state',
+        'user-read-currently-playing',
+        'user-modify-playback-state',
+        'user-library-read',
+        'user-library-modify',
+        'user-read-private',
+        'user-read-email'
+    ) -join '%20'
+    $State = (New-Guid).ToString()
+
+    $Uri = 'https://accounts.spotify.com/authorize'
+    $Uri += "?client_id=$($Application.ClientId)"
+    $Uri += '&response_type=code'
+    $Uri += "&redirect_uri=$EncodedRedirectUri"
+    $Uri += "&state=$State"
+    $Uri += "&scope=$EncodedScopes"
+
+    # Create an Http Server
+    $Listener = [System.Net.HttpListener]::new() 
+    $Prefix = $Application.RedirectUri.Substring(0, $Application.RedirectUri.LastIndexOf('/') + 1) # keep uri until the last '/' included
+    $Listener.Prefixes.Add($Prefix)
+    $Listener.Start()
+    if ($Listener.IsListening) {
+        Write-Verbose "HTTP Server is ready to receive Authorization Code"
+        $HttpServerReady = $true
+    }
+    else {
+        Write-Verbose "HTTP Server is not ready. Fall back to manual method"
+        $HttpServerReady = $false
+    }
+
+
+    # STEP 2 : Open browser to get Authorization
+    if ($IsMacOS) {
+        Write-Verbose "Open Mac OS browser"
+        open $URI
+    }
+    elseif ($IsLinux) {
+        $Listener.Stop()
+        Throw 'Authorization Code Flow is not supported on Linux'
+    }
+    else {
+        # So we are on Windows
+        Write-Verbose "Open Windows browser"
+        rundll32 url.dll, FileProtocolHandler $URI
+    }
+
+
+    # STEP 3 : Get response
+    if ($httpServerReady) {
+        Write-Host 'Waiting 30sec for authorization acceptance'
+        $Task = $null
+        $StartTime = Get-Date
+        while ($Listener.IsListening -and ((Get-Date) - $StartTime) -lt '0.00:00:30' ) {
+    
+            if ($null -eq $Task) {
+                $task = $Listener.GetContextAsync()
+            }
+    
+            if ($Task.IsCompleted) {
+                $Context = $task.Result
+                $Task = $null
+                $Response = $context.Request.Url
+                $ContextResponse = $context.Response
+    
+                [string]$html = '<script>close()</script>Thanks! You can close this window now.'
+    
+                $htmlBuffer = [System.Text.Encoding]::UTF8.GetBytes($html) # convert html to bytes
+    
+                $ContextResponse.ContentLength64 = $htmlBuffer.Length
+                $ContextResponse.OutputStream.Write($htmlBuffer, 0, $htmlBuffer.Length)
+                $ContextResponse.OutputStream.Close()
+                $Listener.Stop()
+                break;
+            }
+        }
+    }
+    else {
+        $Response = Read-Host "Paste the entire URL that it redirects you to"
+        $Response = [System.Uri]$Response
+    }
+
+    # STEP 4 : Check and Parse response
+    # check Response
+    if ($Response.OriginalString -eq '') {
+        Throw 'Response of Authorization Code retrieval can''t be empty'
+    }
+
+    # parse query
+    $ResponseQuery = [System.Web.HttpUtility]::ParseQueryString($Response.Query)
+
+    # check state
+    if ($ResponseQuery['state'] -ne $State) {
+        Throw 'State returned during Authorization Code retrieval doesn''t match state passed'
+    }
+
+    # check if an error has been returned
+    if ($ResponseQuery['error']) {
+        Throw "Error occured during Authorization Code retrieval : $($ResponseQuery['error'])"
+    }
+    
+    # all checks are passed, we should have the code
+    if ($ResponseQuery['code']) {
+        $AuthorizationCode = $ResponseQuery['code']
+    }
+    else {
+        Throw 'Authorization Code not returned during Authorization Code retrieval'
+    }
+
+    # Authorization Code is in $AuthorizationCode
+
+    # ------------------------------ Token retrieval ------------------------------
+    # STEP 1 : Prepare
+    $Uri = 'https://accounts.spotify.com/api/token'
+    $Method = 'Post'
+    $Body = @{
+        grant_type    = 'authorization_code'
+        code          = $AuthorizationCode
+        redirect_uri  = $Application.RedirectUri
+        client_id     = $Application.ClientId # alternative way to send the client id and secret
+        client_secret = $Application.ClientSecret # alternative way to send the client id and secret
+    }
+
+    # STEP 2 : Make request to the Spotify Accounts service
+    try {
+        Write-Verbose "Send request to get access token."
+        $CurrentTime = Get-Date
+        $Response = Invoke-WebRequest -Uri $Uri -Method $Method -Body $Body
+    }
+    catch {
+        Throw "Error occured during request of access token : $($PSItem[0].ToString())"
+    }
+
+    # STEP 3 : Parse and save response
+    $ResponseContent = $Response.Content | ConvertFrom-Json
+
+    $Token = @{
+        access_token  = $ResponseContent.access_token
+        token_type    = $ResponseContent.token_type
+        scope         = $ResponseContent.scope
+        expires       = $CurrentTime.AddSeconds($ResponseContent.expires_in).ToString('u')
+        refresh_token = $ResponseContent.refresh_token
+    }
+
+    Set-SpotifyApplication -Name $ApplicationName -Token $Token
+    Write-Verbose 'Successfully saved Token'
+
+    return $Token.access_token
 }
