@@ -40,7 +40,9 @@ function Send-SpotifyCall {
 
     Write-Verbose 'Attempting to send request to API'
 
+    $ProgressPreference = 'SilentlyContinue'
     $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
+    $ProgressPreference = 'Continue'
 
     Write-Verbose 'We got a response'
     return $Response.Content | ConvertFrom-Json
