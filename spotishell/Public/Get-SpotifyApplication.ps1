@@ -37,6 +37,7 @@ function Get-SpotifyApplication {
 
     # if All switch is specified return all applications
     if ($All) {
+        Write-Verbose 'Read All Spotify Application'
         return Get-Content -Path ($StorePath + '*') -Filter '*.json' -Raw | ConvertFrom-Json | ConvertTo-Hashtable
     }
     
@@ -46,5 +47,6 @@ function Get-SpotifyApplication {
         Throw 'The specified Application doesn''t exist'
     }
 
+    Write-Verbose "Read Spotify Application : $Name"
     Return Get-Content -Path $ApplicationFilePath -Raw | ConvertFrom-Json -ErrorAction Stop | ConvertTo-Hashtable
 }
