@@ -1,26 +1,40 @@
-function Get-Artist {
-  <#
-.SYNOPSIS
-    Gets an Artist.
-.DESCRIPTION
-    Gets an Artist with a specific spotify Id, only takes one
-.EXAMPLE
-    PS C:\> Get-Artist -Id "blahblahblah"
-    Retrieves an artist from spotify with the Id of "blahblahblah"
-.PARAMETER Id
-    The spotify Id of the artist we want to look up
+<#
+    .SYNOPSIS
+        Gets one or more artists.
+    .DESCRIPTION
+        Gets one or more artists with specific Spotify Ids
+    .EXAMPLE
+        PS C:\> Get-Artist -Id "blahblahblah"
+        Retrieves an artist from Spotify with the Id of "blahblahblah"
+    .EXAMPLE
+        PS C:\> Get-Artist -Ids 'blahblahblah','blahblahblah2'
+        Retrieves both specified artists from Spotify with Ids 'blahblahblah' and 'blahblahblah2'
+    .EXAMPLE
+        PS C:\> @('blahblahblah','blahblahblah2') | Get-Artist
+        Retrieves both specified artists from Spotify with Ids 'blahblahblah' and 'blahblahblah2'
+    .PARAMETER Ids
+        One or more Artist Ids
+    .PARAMETER ApplicationName
+        Specifies the Spotify Application Name (otherwise default is used)
 #>
-  param (
-    # Id of the artist we want to look up
-    [Parameter(Mandatory)]
-    [string]
-    $Id
-  )
+function Get-Artist {
+    param (
+        [Parameter(Mandatory, ValueFromPipeline)]
+        # [ValidateNotNullOrEmpty()]
+        [Alias('Id')]
+        [array]
+        $Ids,
 
-  Write-Verbose "Attempting to return info on artist with Id $Id"
-  $Method = "Get"
-  $Uri = "https://api.spotify.com/v1/artists/" + $Id
+        [string]
+        $ApplicationName
+    )
 
-  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-  return $Response
+    $Method = 'Get'
+
+    for ($i = 0; $i -lt $Ids.Count; $i += 50) {
+
+        $Uri = 'https://api.spotify.com/v1/artists?ids=' + ($Ids[$i..($i + 49)] -join '%2C')
+        $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ApplicationName $ApplicationName
+        $Response.artists
+    }
 }

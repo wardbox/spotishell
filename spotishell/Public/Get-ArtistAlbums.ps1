@@ -1,86 +1,65 @@
-function Get-ArtistAlbums {
-  <#
-.SYNOPSIS
-    Get Spotify catalog information about an artist�s albums.
-.DESCRIPTION
-    Optional parameters can be specified in the query string to filter and sort the response.
-.EXAMPLE
-    PS C:\> Get-ArtistAlbums -Id "blahblah" -Album -AppearsOn
-    Retrieves an artist's albums from spotify with the Id of "blahblahblah".  This will only return albums and appears on albums.
-.PARAMETER ArtistId
-    This is the Id of the artist you want to get albums for
-.NOTES
-    If your search returns more than 50, this will truncate it, but give you the next api call to make to get more.
-    Planning to add functionality to fix this later.
+<#
+    .SYNOPSIS
+        Get Spotify catalog information about an artist's albums.
+    .DESCRIPTION
+        Optional parameters can be specified to filter the response.
+    .EXAMPLE
+        PS C:\> Get-ArtistAlbums -Id "blahblah" -Album -AppearsOn
+        Retrieves an artist's albums from Spotify with the Id of "blahblahblah". This will only return albums and appears on albums.
+    .PARAMETER Id
+        This is the Id of the artist you want to get albums for
+    .PARAMETER Album
+        Filter to get Albums of this artist
+    .PARAMETER Single
+        Filter to get Singles of this artist
+    .PARAMETER AppearsOn
+        Filter to get Albums where this artist appears on
+    .PARAMETER Compilation
+        Filter to get Compilations of this artist
+    .PARAMETER ApplicationName
+        Specifies the Spotify Application Name (otherwise default is used)
 #>
-  param (
-    # Id of the artist
-    [Parameter(Mandatory)]
-    [string]
-    $ArtistId,
+function Get-ArtistAlbums {
+    param (
+        [Parameter(Mandatory)]
+        [string]
+        $Id,
 
-    # Choose to look up albums
-    [switch]
-    $Album,
+        [switch]
+        $Album,
 
-    # Choose to look up singles
-    [switch]
-    $Single,
+        [switch]
+        $Single,
 
-    # Choose to look up appears on
-    [switch]
-    $AppearsOn,
+        [switch]
+        $AppearsOn,
 
-    # Choose to look up compilations
-    [switch]
-    $Compilation
-  )
+        [switch]
+        $Compilation,
 
-  $Query = ""
-  $Filters = @()
+        [string]
+        $ApplicationName
+    )
 
-  if ($Album) {
-    $Filters += "album"
-  } elseif ($Single) {
-    $Filters += "single"
-  } elseif ($AppearsOn) {
-    $Filters += "appears_on"
-  } elseif ($Comilation) {
-    $Filters += "compilation"
-  } else {
-    $Filters += "album"
-    $Filters += "single"
-    $Filters += "appears_on"
-    $Filters += "compilation"
-  }
+    Write-Verbose "Attempting to return albums by artist with Id $Id"
+    $Method = 'Get'
+    $Uri = "https://api.spotify.com/v1/artists/$Id/albums?limit=50"
 
-  # If we have anything to filter by, we need to add this to our query first.
-  if ($Filters) {
-    Write-Verbose "We've got some filters, let's load up our query."
-    $Count = $Filters.Count
-    $Query += "include_groups="
-    foreach ($Record in $Filters) {
-      if ($Count -gt 1) {
-        $Query += "$Record%2C"
-      } else {
-        $Query += $Record
-      }
-      Write-Verbose "Current query: $Query"
-      # Decrement so we can see if we need to add a "%2C" at the end or not, kinda dumb but easy enough
-      $Count--
+    if ($Album -or $Single -or $AppearsOn -or $Compilation) {
+        $IncludeGroups = @()
+        if ($Album) { $IncludeGroups += 'album' }
+        if ($Single) { $IncludeGroups += 'single' }
+        if ($AppearsOn) { $IncludeGroups += 'appears_on' }
+        if ($Compilation) { $IncludeGroups += 'compilation' }
+
+        Uri += '&' + ($IncludeGroups -join '%2C')
     }
-  }
 
-  Write-Verbose "Attempting to return albums by artist with Id $Id"
-  $Method = "Get"
-  $Uri = "https://api.spotify.com/v1/artists/" + "$ArtistId" + "/albums"
+    # build a fake Response to start the machine
+    $Response = @{next = $Uri }
 
-  if ($Query) {
-    $Uri += "?" + $Query
-  }
-
-  $Uri += "&limit=50"
-
-  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-  return $Response
+    While ($Response.next) {
+        $Response = Send-SpotifyCall -Method $Method -Uri $Response.next -ApplicationName $ApplicationName
+        $Response.items # this return items that will be aggregated with items of other loops
+    }
 }
