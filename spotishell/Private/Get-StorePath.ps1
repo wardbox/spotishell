@@ -9,9 +9,9 @@
 #>
 function Get-StorePath {
     if ($IsMacOS -or $IsLinux) {
-        return $home + "/.spotishell/"
+        return $home + '/.spotishell/'
     }
     else {
-        return $env:LOCALAPPDATA + "\spotishell\"
+        return $env:LOCALAPPDATA + '\spotishell\'
     }
 }

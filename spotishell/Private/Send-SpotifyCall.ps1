@@ -38,10 +38,10 @@ function Send-SpotifyCall {
         Authorization = 'Bearer ' + (Get-SpotifyAccessToken -ApplicationName $ApplicationName)
     }
 
-    Write-Verbose "Attempting to send request to API"
+    Write-Verbose 'Attempting to send request to API'
 
     $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
 
-    Write-Verbose "We got a response"
+    Write-Verbose 'We got a response'
     return $Response.Content | ConvertFrom-Json
 }

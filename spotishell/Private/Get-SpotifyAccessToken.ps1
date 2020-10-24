@@ -46,7 +46,7 @@ function Get-SpotifyAccessToken {
 
             # STEP 2 : Make request to the Spotify Accounts service
             try {
-                Write-Verbose "Send request to refresh access token."
+                Write-Verbose 'Send request to refresh access token.'
                 $CurrentTime = Get-Date
                 $Response = Invoke-WebRequest -Uri $Uri -Method $Method -Body $Body
             }
@@ -115,18 +115,18 @@ function Get-SpotifyAccessToken {
     $Listener.Prefixes.Add($Prefix)
     $Listener.Start()
     if ($Listener.IsListening) {
-        Write-Verbose "HTTP Server is ready to receive Authorization Code"
+        Write-Verbose 'HTTP Server is ready to receive Authorization Code'
         $HttpServerReady = $true
     }
     else {
-        Write-Verbose "HTTP Server is not ready. Fall back to manual method"
+        Write-Verbose 'HTTP Server is not ready. Fall back to manual method'
         $HttpServerReady = $false
     }
 
 
     # STEP 2 : Open browser to get Authorization
     if ($IsMacOS) {
-        Write-Verbose "Open Mac OS browser"
+        Write-Verbose 'Open Mac OS browser'
         open $URI
     }
     elseif ($IsLinux) {
@@ -135,7 +135,7 @@ function Get-SpotifyAccessToken {
     }
     else {
         # So we are on Windows
-        Write-Verbose "Open Windows browser"
+        Write-Verbose 'Open Windows browser'
         rundll32 url.dll, FileProtocolHandler $URI
     }
 
@@ -170,7 +170,7 @@ function Get-SpotifyAccessToken {
         }
     }
     else {
-        $Response = Read-Host "Paste the entire URL that it redirects you to"
+        $Response = Read-Host 'Paste the entire URL that it redirects you to'
         $Response = [System.Uri]$Response
     }
 
@@ -217,7 +217,7 @@ function Get-SpotifyAccessToken {
 
     # STEP 2 : Make request to the Spotify Accounts service
     try {
-        Write-Verbose "Send request to get access token."
+        Write-Verbose 'Send request to get access token.'
         $CurrentTime = Get-Date
         $Response = Invoke-WebRequest -Uri $Uri -Method $Method -Body $Body
     }
