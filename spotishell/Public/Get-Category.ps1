@@ -33,7 +33,7 @@ function Get-Category {
     )
 
     $Method = 'Get'
-    $Uri = "https://api.spotify.com/v1/browse/categories"
+    $Uri = 'https://api.spotify.com/v1/browse/categories'
 
     $Query = @()
     if ($Country) { $Query += 'country=' + $Country }
@@ -43,8 +43,7 @@ function Get-Category {
         $Uri += '/' + $Id
         if ($Query.Count) { $Uri += '?' + ($Query -join '&') }
 
-        $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ApplicationName $ApplicationName
-        $Response
+        Send-SpotifyCall -Method $Method -Uri $Uri -ApplicationName $ApplicationName
     }
     else {
 

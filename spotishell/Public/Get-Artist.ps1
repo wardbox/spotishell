@@ -4,8 +4,8 @@
     .DESCRIPTION
         Gets one or more artists with specific Spotify Ids
     .EXAMPLE
-        PS C:\> Get-Artist -Id "blahblahblah"
-        Retrieves an artist from Spotify with the Id of "blahblahblah"
+        PS C:\> Get-Artist -Id 'blahblahblah'
+        Retrieves an artist from Spotify with the Id of 'blahblahblah'
     .EXAMPLE
         PS C:\> Get-Artist -Ids 'blahblahblah','blahblahblah2'
         Retrieves both specified artists from Spotify with Ids 'blahblahblah' and 'blahblahblah2'
@@ -20,7 +20,7 @@
 function Get-Artist {
     param (
         [Parameter(Mandatory, ValueFromPipeline)]
-        # [ValidateNotNullOrEmpty()]
+        [ValidateNotNullOrEmpty()]
         [Alias('Id')]
         [array]
         $Ids,
