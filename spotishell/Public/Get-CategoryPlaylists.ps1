@@ -1,46 +1,39 @@
+<#
+    .SYNOPSIS
+        Gets a category's playlists.
+    .DESCRIPTION
+        Get a list of Spotify playlists tagged with a particular category.
+    .EXAMPLE
+        PS C:\> Get-CategoryPlaylists 'toplists'
+        Retrieves details on a specific category with Id "toplists"
+    .PARAMETER Id
+        The Id of the category we want to pull info on.
+    .PARAMETER Country
+        Specifies the country if you want to narrow the list of returned categories to those relevant to a particular country
+        Uses "ISO 3166-1 alpha-2" country code : https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+        Ex : FR
+#>
 function Get-CategoryPlaylists {
-  <#
-  .SYNOPSIS
-    Gets a category's playlists.
-  .DESCRIPTION
-    Get a list of Spotify playlists tagged with a particular category.
-  .EXAMPLE
-    PS C:\> Get-CategoryPlaylists "toplists"
-    Retrieves details on a specific category with Id "toplists"
-  .PARAMETER Id
-    This should be a string
-    The Id of the category we want to pull info on.
-  #>
-  param(
-    # Id
-    [Parameter(Mandatory)]
-    [String]
-    $Id
-  )
+    param(
+        [Parameter(Mandatory)]
+        [String]
+        $Id,
 
-  $Limit = "50"
-  $Offset = "0"
+        [string]
+        $Country
+    )
 
-  $Query = "?&limit=$Limit&offset=$Offset"
+    $Method = 'Get'
+    $Uri = 'https://api.spotify.com/v1/browse/categories/$Id/playlists?limit=50'
+    if ($Country) { $Uri += '&country=' + $Country }
 
-  Write-Verbose "Attempting to return playlists that belong to category with Id $Id"
-  $Method = "Get"
-  $Uri = "https://api.spotify.com/v1/browse/categories/" + $Id + "/playlists" + $Query
-
-  $Response = (Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop).playlists
-
-  # if we have to get more results because they weren't all included in the intial batch
-  if ($Response.next) {
-    # this is a bit messy for now, but shows the user that there were multiple calls that went above the API limit
-    $ResponseArray = @()
-    $ResponseArray += $Response
-    While ($Response.next) {
-      $Response = (Send-SpotifyCall -Method $Method -Uri $Response.next -ErrorAction Stop).playlists
-      $ResponseArray += $Response
+    # build a fake Response to start the machine
+    $Response = @{ 
+        playlists = @{next = $Uri }
     }
-    $ResponseArray += $Response
-    return $ResponseArray
-  } else {
-    return $Response
-  }
+    
+    While ($Response.playlists.next) {
+        $Response = Send-SpotifyCall -Method $Method -Uri $Response.playlists.next -ApplicationName $ApplicationName
+        $Response.playlists.items # this return items that will be aggregated with items of other loops
+    }
 }
