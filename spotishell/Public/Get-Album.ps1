@@ -20,7 +20,7 @@
 function Get-Album {
     param (
         [Parameter(Mandatory, ValueFromPipeline)]
-        # [ValidateNotNullOrEmpty()]
+        [ValidateNotNullOrEmpty()]
         [Alias('Id')]
         [array]
         $Ids,
