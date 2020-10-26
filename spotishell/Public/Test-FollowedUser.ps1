@@ -1,34 +1,37 @@
+<#
+    .SYNOPSIS
+        Check if current user follows one or more users
+    .EXAMPLE
+        PS C:\> Test-FollowedUser -Id "blahblahblah"
+        Check to see if the current user follows the user with the Id of 'blahblahblah'
+    .EXAMPLE
+        PS C:\> Test-FollowedUser -Ids 'blahblahblah','blahblahblah2'
+        Check to see if the current user follows both specified users from Spotify with Ids 'blahblahblah' and 'blahblahblah2'
+    .EXAMPLE
+        PS C:\> @('blahblahblah','blahblahblah2') | Test-FollowedUser
+        Check to see if the current user follows both specified users from Spotify with Ids 'blahblahblah' and 'blahblahblah2'
+    .PARAMETER Ids
+        One or more User Ids
+    .PARAMETER ApplicationName
+        Specifies the Spotify Application Name (otherwise default is used)
+#>
 function Test-FollowedUser {
-  <#
-  .SYNOPSIS
-    Check if current user follows a user
-  .EXAMPLE
-    PS C:\> Test-FollowedUser -Username "xyz" -Id "blahblahblah"
-    Check to see if the user authed under the current access token follow the user with the Id of "blahblahblah"
-  .PARAMETER Username
-    This should be a string.
-    You get this from running Get-SpotifyUserAccessToken
-  .PARAMETER Id
-    The spotify Id of the user we want to check
-  #>
   param (
-    # UserAccessToken
-    [Parameter(Mandatory)]
-    [String]
-    $Username,
-    # Id of the user we want to get check
-    [Parameter(Mandatory)]
-    [string]
-    $Id
+      [Parameter(Mandatory, ValueFromPipeline)]
+      [ValidateNotNullOrEmpty()]
+      [Alias('Id')]
+      [array]
+      $Ids,
+
+      [string]
+      $ApplicationName
   )
 
-  Write-Verbose "Checking follow of this user"
-  $Method = "Get"
-  $Uri = "https://api.spotify.com/v1/me/following/contains?type=user&ids=$Id"
-  $AccessToken = Get-SpotifyUserAccessToken -Username $Username
-  $Auth = @{
-    Authorization = "Bearer $($AccessToken.access_token)"
-  }
+  $Method = 'Get'
 
-  Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -ErrorAction Stop
+  for ($i = 0; $i -lt $Ids.Count; $i += 50) {
+
+      $Uri = 'https://api.spotify.com/v1/me/following/contains?type=user&ids=' + ($Ids[$i..($i + 49)] -join '%2C')
+      Send-SpotifyCall -Method $Method -Uri $Uri -ApplicationName $ApplicationName
+  }
 }

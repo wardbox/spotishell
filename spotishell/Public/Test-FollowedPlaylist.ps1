@@ -1,36 +1,39 @@
+<#
+    .SYNOPSIS
+        Check if current user follows a playlist
+    .EXAMPLE
+        PS C:\> Test-FollowedPlaylist -PlaylistId 'blahblahblah' -UserIds (Get-CurrentUserProfile).id
+        Check to see if the current user follows the playlist with the Id of 'blahblahblah'
+    .EXAMPLE
+        PS C:\> Test-FollowedPlaylist -PlaylistId 'blahblahblah' -UserIds 'user1','user2'
+        Check to see if the users 'user1' and 'user2' follow the playlist with the Id of 'blahblahblah'
+    .PARAMETER PlaylistId
+        The spotify Id of the playlist we want to check
+    .PARAMETER UserIds
+        One or more User Ids that may follow the playlist
+    .PARAMETER ApplicationName
+        Specifies the Spotify Application Name (otherwise default is used)
+#>
 function Test-FollowedPlaylist {
-  <#
-  .SYNOPSIS
-    Check if current user follows a playlist
-  .EXAMPLE
-    PS C:\> Test-FollowedPlaylist -Username "xyz" -Id "blahblahblah"
-    Check to see if the user authed under the current access token follow the playlist with the Id of "blahblahblah"
-  .PARAMETER Username
-    This should be a string.
-    You get this from running Get-SpotifyUserAccessToken
-  .PARAMETER Id
-    The spotify Id of the playlist we want to check
-  #>
-  param (
-    # UserAccessToken
-    [Parameter(Mandatory)]
-    [String]
-    $Username,
-    # Id of the playlist we want to get check
-    [Parameter(Mandatory)]
-    [string]
-    $Id
-  )
+    param (
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $PlaylistId,
 
-  $myId = (Get-MyProfile -Username $Username).id
+        [Parameter(Mandatory)]
+        [array]
+        $UserIds,
 
-  Write-Verbose "Checking follow of this playlist"
-  $Method = "Get"
-  $Uri = "https://api.spotify.com/v1/playlists/$Id/followers/contains?ids=$myId"
-  $AccessToken = Get-SpotifyUserAccessToken -Username $Username
-  $Auth = @{
-    Authorization = "Bearer $($AccessToken.access_token)"
-  }
+        [string]
+        $ApplicationName
+    )
 
-  Send-SpotifyCall -Method $Method -Uri $Uri -Header $Auth -ErrorAction Stop
+    $Method = 'Get'
+
+    for ($i = 0; $i -lt $UserIds.Count; $i += 5) {
+
+        $Uri = "https://api.spotify.com/v1/playlists/$PlaylistId/followers/contains?ids=" + ($UserIds[$i..($i + 4)] -join '%2C')
+        Send-SpotifyCall -Method $Method -Uri $Uri -ApplicationName $ApplicationName
+    }
 }
