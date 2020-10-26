@@ -1,24 +1,25 @@
+<#
+    .SYNOPSIS
+        Get public profile information about a Spotify user.
+    .EXAMPLE
+        PS C:\> Get-UserProfile 'myusername'
+        Gets the public user profile information about myusername
+    .PARAMETER UserId
+        Specifies the spotify user we want to search for
+    .PARAMETER ApplicationName
+        Specifies the Spotify Application Name (otherwise default is used)
+#>
 function Get-UserProfile {
-  <#
-  .SYNOPSIS
-    Get public profile information about a Spotify user.
-  .EXAMPLE
-    PS C:\> Get-UserProfile -Username "myusername"
-   Gets the public user profile information about myusername
-  .PARAMETER Username
-    This should be a string.
-    Username of the spotify user we want to search for
-  #>
-  param (
-    # Username
-    [String]
-    $Username = 'default'
-  )
-  
-  Write-Verbose "Attempting to return profile of user with ID $Username"
-  $Method = "Get"
-  $Uri = "https://api.spotify.com/v1/users/" + $Username
+    param (
+        [String]
+        $UserId,
 
-  $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ErrorAction Stop
-  return $Response
+        [string]
+        $ApplicationName
+    )
+    
+    $Method = 'Get'
+    $Uri = 'https://api.spotify.com/v1/users/' + $UserId
+
+    Send-SpotifyCall -Method $Method -Uri $Uri -ApplicationName $ApplicationName
 }
