@@ -19,6 +19,8 @@
         Specifies the desired language
         Uses an "ISO 639-1" language code and an "ISO 3166-1 alpha-2" country code, joined by an underscore
         Ex : es_MX    meaning Spanish (Mexico)
+    .PARAMETER ApplicationName
+        Specifies the Spotify Application Name (otherwise default is used)
 #>
 function Get-Category {
     param(
@@ -29,7 +31,10 @@ function Get-Category {
         $Country,
 
         [String]
-        $Locale
+        $Locale,
+
+        [string]
+        $ApplicationName
     )
 
     $Method = 'Get'
