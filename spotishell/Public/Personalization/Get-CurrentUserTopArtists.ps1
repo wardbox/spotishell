@@ -2,7 +2,7 @@
     .SYNOPSIS
         Get the current user's top artists based on calculated affinity.
     .EXAMPLE
-        PS C:\> Get-UserTopArtists -TimeRange Long
+        PS C:\> Get-CurrentUserTopArtists -TimeRange Long
         Gets top artists for user over several years
     .PARAMETER TimeRange
         Long: calculated from several years of data and including all new data as it becomes available

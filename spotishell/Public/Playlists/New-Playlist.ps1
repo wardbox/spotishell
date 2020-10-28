@@ -2,7 +2,7 @@
     .SYNOPSIS
         Create a playlist for a Spotify user. (The playlist will be empty until you add tracks.)
     .EXAMPLE
-        PS C:\> New-Playlist -Name 'New Playlist'
+        PS C:\> New-Playlist -UserId (Get-CurrentUserProfile).id -Name 'New Playlist'
         Create a new plalist named 'New Playlist'
     .PARAMETER UserId
         Specifies the user's Spotify user ID.
