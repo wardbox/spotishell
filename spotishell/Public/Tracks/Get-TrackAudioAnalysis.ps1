@@ -6,12 +6,17 @@
         Retrieves audio analysis for a track from spotify with the Id of 'blahblahblah'
     .PARAMETER Id
         The Spotify ID for the track.
+    .PARAMETER ApplicationName
+        Specifies the Spotify Application Name (otherwise default is used)
 #>
 function Get-TrackAudioAnalysis {
     param (
         [Parameter(Mandatory)]
         [string]
-        $Id
+        $Id,
+
+        [string]
+        $ApplicationName
     )
 
     $Method = 'Get'
