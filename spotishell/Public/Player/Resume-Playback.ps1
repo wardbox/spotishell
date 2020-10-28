@@ -12,6 +12,7 @@
 #>
 function Resume-Playback {
     param (
+        [Parameter(ValueFromPipeline)]
         [array]
         $DeviceId,
 

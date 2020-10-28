@@ -27,7 +27,7 @@ function Remove-PlaylistItems {
         [string]
         $Id,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [array]
         $Tracks,
 

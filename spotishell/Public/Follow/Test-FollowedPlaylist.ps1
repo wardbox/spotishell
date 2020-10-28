@@ -21,7 +21,7 @@ function Test-FollowedPlaylist {
         [string]
         $PlaylistId,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [array]
         $UserIds,
 

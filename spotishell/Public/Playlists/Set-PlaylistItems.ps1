@@ -20,6 +20,7 @@ function Set-PlaylistItems {
         [string]
         $Id,
 
+        [Parameter(ValueFromPipeline)]
         [array]
         $Uris,
 
