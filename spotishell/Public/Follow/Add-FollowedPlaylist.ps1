@@ -18,7 +18,7 @@ function Add-FollowedPlaylist {
         $Id,
 
         [bool]
-        $Public = $true,
+        $Public,
 
         [string]
         $ApplicationName
@@ -26,7 +26,10 @@ function Add-FollowedPlaylist {
 
     $Method = 'Put'
     $Uri = "https://api.spotify.com/v1/playlists/$Id/followers"
-    $Body = ConvertTo-Json -InputObject @{public = $Public.ToString() }
+
+    $BodyHashtable = @{}
+    if ($null -ne $Public) { $BodyHashtable.public = $Public.ToString().ToLower() }
+    $Body = ConvertTo-Json $BodyHashtable -Compress
 
     Send-SpotifyCall -Method $Method -Uri $Uri -Body $Body -ApplicationName $ApplicationName | Out-Null
 }
