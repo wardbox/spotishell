@@ -1,8 +1,6 @@
 <#
     .SYNOPSIS
-        Get Spotify catalog information about an artist's top tracks by country.
-    .DESCRIPTION
-        Get Spotify catalog information about an artist's top tracks by country.
+        Get Spotify catalog information about an artist’s top tracks by country.
     .EXAMPLE
         PS C:\> Get-ArtistTopTracks -Id 'blahblahblah'
         Retrieves top tracks by artist with Id 'blahblahblah' in your country

@@ -1,8 +1,6 @@
 <#
     .SYNOPSIS
-        Gets album tracks.
-    .DESCRIPTION
-        Gets album tracks with a specific spotify album Id
+        Get Spotify catalog information about an album’s tracks.
     .EXAMPLE
         PS C:\> Get-AlbumTracks -Id 'blahblahblah'
         Retrieves album tracks from spotify album with the Id of "blahblahblah"

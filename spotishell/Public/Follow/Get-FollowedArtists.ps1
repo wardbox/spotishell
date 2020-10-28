@@ -1,8 +1,6 @@
 <#
     .SYNOPSIS
-        Fetches followed artists on the current user's profile
-    .DESCRIPTION
-        Grabs artist data for all followed artists for the user authed under the current application
+        Get the current user’s followed artists.
     .EXAMPLE
         PS C:\> Get-FollowedArtists
         Grabs data of all followed artist and returns them in a list

@@ -1,8 +1,6 @@
 <#
     .SYNOPSIS
-        Get Spotify catalog information about an artist's albums.
-    .DESCRIPTION
-        Optional parameters can be specified to filter the response.
+        Get Spotify catalog information about an artist’s albums.
     .EXAMPLE
         PS C:\> Get-ArtistAlbums -Id "blahblah" -Album -AppearsOn
         Retrieves an artist's albums from Spotify with the Id of "blahblahblah". This will only return albums and appears on albums.

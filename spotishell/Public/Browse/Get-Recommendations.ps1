@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Gets recommendations.
+        Create a playlist-style listening experience based on seed artists, tracks and genres.
     .DESCRIPTION
         Recommendations are generated based on the available information for a given seed entity and matched against similar artists and tracks.
         If there is sufficient information about the provided seeds, a list of tracks will be returned together with pool size details.

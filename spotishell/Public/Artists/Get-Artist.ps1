@@ -1,8 +1,6 @@
 <#
     .SYNOPSIS
-        Gets one or more artists.
-    .DESCRIPTION
-        Gets one or more artists with specific Spotify Ids
+        Get Spotify catalog information for one or more artists based on their Spotify IDs.
     .EXAMPLE
         PS C:\> Get-Artist -Id 'blahblahblah'
         Retrieves an artist from Spotify with the Id of 'blahblahblah'

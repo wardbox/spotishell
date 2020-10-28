@@ -1,7 +1,5 @@
 <#
     .SYNOPSIS
-        Gets a category's playlists.
-    .DESCRIPTION
         Get a list of Spotify playlists tagged with a particular category.
     .EXAMPLE
         PS C:\> Get-CategoryPlaylists 'toplists'

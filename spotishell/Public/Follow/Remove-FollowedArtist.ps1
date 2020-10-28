@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Unfollow a new Artist
+        Remove the current user as a follower of one or more artists.
     .EXAMPLE
         PS C:\> Remove-FollowedArtist -Id 'blahblahblah'
         Remove the artist with the Id of 'blahblahblah' to follow for the user authed under the current Application

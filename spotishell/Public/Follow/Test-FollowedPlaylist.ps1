@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Check if current user follows a playlist
+        Check to see if one or more Spotify users are following a specified playlist.
     .EXAMPLE
         PS C:\> Test-FollowedPlaylist -PlaylistId 'blahblahblah' -UserIds (Get-CurrentUserProfile).id
         Check to see if the current user follows the playlist with the Id of 'blahblahblah'

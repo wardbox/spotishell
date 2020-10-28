@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Check if current user follows one or more artists
+        Check to see if the current user is following one or more artists.
     .EXAMPLE
         PS C:\> Test-FollowedArtist -Id "blahblahblah"
         Check to see if the current user follows the artist with the Id of 'blahblahblah'

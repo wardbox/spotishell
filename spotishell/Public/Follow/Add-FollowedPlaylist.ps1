@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Follow a new playlist
+        Add the current user as a follower of a playlist.
     .EXAMPLE
         PS C:\> Add-FollowedPlaylist -Id 'blahblahblah'
         Add the playlist with the Id of 'blahblahblah' to follow for the user authed under the current application

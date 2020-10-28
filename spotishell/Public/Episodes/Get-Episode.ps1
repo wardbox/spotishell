@@ -1,8 +1,6 @@
 <#
     .SYNOPSIS
-        Gets one or more episodes.
-    .DESCRIPTION
-        Gets one or more episodes with specific Spotify Ids
+        Get Spotify catalog information for one or more episodes based on their Spotify IDs.
     .EXAMPLE
         PS C:\> Get-Episode -Id 'blahblahblah'
         Retrieves an episode from Spotify with the Id of 'blahblahblah'

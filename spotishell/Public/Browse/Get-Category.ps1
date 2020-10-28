@@ -1,7 +1,5 @@
 <#
     .SYNOPSIS
-        Gets one or more categories.
-    .DESCRIPTION
         Get one or more categories used to tag items in Spotify (on, for example, the Spotify player’s “Browse” tab).
     .EXAMPLE
         PS C:\> Get-Category -Id 'toplists'

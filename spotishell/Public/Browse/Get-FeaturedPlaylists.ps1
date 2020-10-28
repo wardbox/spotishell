@@ -1,8 +1,6 @@
 <#
     .SYNOPSIS
-        Get featured playlists
-    .DESCRIPTION
-        Get a list of new album releases featured in Spotify (shown, for example, on a Spotify player's Browse tab).
+        Get a list of Spotify featured playlists (shown, for example, on a Spotify player’s ‘Browse’ tab).
     .EXAMPLE
         PS C:\> Get-FeaturedPlaylists
         Retrieves all featured playlists

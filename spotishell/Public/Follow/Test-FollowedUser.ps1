@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Check if current user follows one or more users
+        Check to see if the current user is following one or more other Spotify users.
     .EXAMPLE
         PS C:\> Test-FollowedUser -Id "blahblahblah"
         Check to see if the current user follows the user with the Id of 'blahblahblah'

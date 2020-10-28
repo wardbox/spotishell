@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Unfollow a Playlist
+        Remove the current user as a follower of a playlist.
     .EXAMPLE
         PS C:\> Remove-FollowedPlaylist -Id 'blahblahblah'
         Remove the playlist with the Id of 'blahblahblah' to follow for the user authed under the current application

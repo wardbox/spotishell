@@ -1,8 +1,6 @@
 <#
     .SYNOPSIS
-        Gets one or more albums.
-    .DESCRIPTION
-        Gets one or more albums with specific spotify Ids
+        Get Spotify catalog information for one or more albums identified by their Spotify IDs.
     .EXAMPLE
         PS C:\> Get-Album -Id 'blahblahblah'
         Retrieves an album from Spotify with the Id of 'blahblahblah'

@@ -1,7 +1,5 @@
 <#
     .SYNOPSIS
-        Get new releases
-    .DESCRIPTION
         Get a list of new album releases featured in Spotify (shown, for example, on a Spotify player’s “Browse” tab).
     .EXAMPLE
         PS C:\> Get-NewReleases

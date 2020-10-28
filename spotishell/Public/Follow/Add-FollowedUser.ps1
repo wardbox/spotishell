@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Follow a new User
+        Add the current user as a follower of one or more other Spotify users.
     .EXAMPLE
         PS C:\> Add-FollowedUser -Id 'blahblahblah'
         Add the user with the Id of 'blahblahblah' to follow for the user authed under the current Application

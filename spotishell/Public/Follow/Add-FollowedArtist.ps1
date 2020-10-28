@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Follow one or more new Artist
+        Add the current user as a follower of one or more artists.
     .EXAMPLE
         PS C:\> Add-FollowedArtist -Id 'blahblahblah'
         Add the artist with the Id of 'blahblahblah' to follow for the user authed under the current Application
