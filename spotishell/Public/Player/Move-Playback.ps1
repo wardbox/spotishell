@@ -16,6 +16,7 @@
 #>
 function Move-Playback {
     param (
+        [Parameter(Mandatory)]
         [string]
         $DeviceId,
 
