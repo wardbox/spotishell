@@ -19,6 +19,8 @@
     .PARAMETER OtherFilters
         Specifies a list of additional query parameters in min_*, max_* and target_* list (https://developer.spotify.com/documentation/web-api/reference/browse/get-recommendations/)
         Ex : @('min_acousticness=1.0','max_energy=1.0','min_popularity=50')
+    .PARAMETER ApplicationName
+        Specifies the Spotify Application Name (otherwise default is used)
     .NOTES
         Max 100 recommendations can be pulled
 #>
@@ -34,7 +36,10 @@ function Get-Recommendations {
         $SeedTracks,
 
         [array]
-        $OtherFilters
+        $OtherFilters,
+
+        [string]
+        $ApplicationName
     )
 
     if (!$SeedArtists -and !$SeedGenres -and !$SeedTracks) {

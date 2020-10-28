@@ -17,6 +17,8 @@
         Specifies the user’s local time to get results tailored for that specific date and time in the day.    
         uses ISO 8601 format: yyyy-MM-ddTHH:mm:ss. 
         Ex : 2014-10-23T09:00:00
+    .PARAMETER ApplicationName
+        Specifies the Spotify Application Name (otherwise default is used)
 #>
 function Get-FeaturedPlaylists {
     param(
@@ -27,7 +29,10 @@ function Get-FeaturedPlaylists {
         $Locale,
 
         [string]
-        $Timestamp
+        $Timestamp,
+
+        [string]
+        $ApplicationName
     )
 
     $Method = 'Get'

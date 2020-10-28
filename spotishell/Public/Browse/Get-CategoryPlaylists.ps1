@@ -10,6 +10,8 @@
         Specifies the country if you want to narrow the list of returned categories to those relevant to a particular country
         Uses "ISO 3166-1 alpha-2" country code : https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
         Ex : FR
+    .PARAMETER ApplicationName
+        Specifies the Spotify Application Name (otherwise default is used)
 #>
 function Get-CategoryPlaylists {
     param(
@@ -18,7 +20,10 @@ function Get-CategoryPlaylists {
         $Id,
 
         [string]
-        $Country
+        $Country,
+
+        [string]
+        $ApplicationName
     )
 
     $Method = 'Get'
