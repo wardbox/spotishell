@@ -35,7 +35,7 @@ New-SpotifyApplication -ClientId "blahblahblah" -ClientSecret "blahblahblahblah"
 
 6. Give it a whirl!
 ```powershell
-Search-Spotify -Query "Bloc Party" -Artist
+Search-Item -Query 'Bloc Party' -Type Artist
 ```
 7. Enjoy the bountiful data :^)
 
