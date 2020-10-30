@@ -132,7 +132,7 @@ function Get-SpotifyAccessToken {
     elseif ($IsLinux) {
         Write-Verbose 'Open Linux browser'
         Write-Verbose 'You should have a freedesktop.org-compliant desktop'
-        xdg-open $URI &
+        (xdg-open $URI &) | Out-Null
     }
     else {
         # So we are on Windows
