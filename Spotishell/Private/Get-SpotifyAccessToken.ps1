@@ -130,8 +130,9 @@ function Get-SpotifyAccessToken {
         open $URI
     }
     elseif ($IsLinux) {
-        $Listener.Stop()
-        Throw 'Authorization Code Flow is not supported on Linux'
+        Write-Verbose 'Open Linux browser'
+        Write-Verbose 'You should have a freedesktop.org-compliant desktop'
+        xdg-open $URI &
     }
     else {
         # So we are on Windows
