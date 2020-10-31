@@ -41,9 +41,28 @@ function Send-SpotifyCall {
     Write-Verbose 'Attempting to send request to API'
 
     $ProgressPreference = 'SilentlyContinue'
-    $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
+    try {
+        $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
+    }
+    catch {
+        # if we hit the rate limit of Spotify API, code is 429
+        if ($_.Exception.Response.StatusCode -eq 429) {
+            $WaitTime = ([int]$_.Exception.Response.Headers['retry-after']) + 1
+            Write-Warning "API Rate Limit reached, Spotify asked to wait $WaitTime seconds"
+
+            # wait number of seconds indicated by Spotify
+            Start-Sleep -Seconds $WaitTime 
+
+            # then make request again (no try catch this time)
+            $Response = Invoke-WebRequest -Method $Method -Headers $Header -Body $Body -Uri $Uri
+        }
+        else {
+            # Exception is not Rate Limit so throw it
+            Throw $PSItem
+        }
+    }
     $ProgressPreference = 'Continue'
 
-    Write-Verbose 'We got a response'
+    Write-Verbose 'We got API response'
     return $Response.Content | ConvertFrom-Json
 }
