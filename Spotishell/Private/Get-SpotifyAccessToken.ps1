@@ -132,7 +132,7 @@ function Get-SpotifyAccessToken {
     elseif ($IsLinux) {
         Write-Verbose 'Open Linux browser'
         Write-Verbose 'You should have a freedesktop.org-compliant desktop'
-        (xdg-open $URI &) | Out-Null
+        Start-Process xdg-open $URI
     }
     else {
         # So we are on Windows
@@ -165,10 +165,10 @@ function Get-SpotifyAccessToken {
                 $ContextResponse.ContentLength64 = $htmlBuffer.Length
                 $ContextResponse.OutputStream.Write($htmlBuffer, 0, $htmlBuffer.Length)
                 $ContextResponse.OutputStream.Close()
-                $Listener.Stop()
                 break;
             }
         }
+        $Listener.Stop()
     }
     else {
         $Response = Read-Host 'Paste the entire URL that it redirects you to'
