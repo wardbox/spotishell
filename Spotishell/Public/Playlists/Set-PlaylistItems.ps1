@@ -41,6 +41,6 @@ function Set-PlaylistItems {
         }
     }
     else {
-        Send-SpotifyCall -Method $Method -Uri $Uri -ApplicationName $ApplicationName
+        Send-SpotifyCall -Method $Method -Uri $Uri -Body '{"uris":[]}' -ApplicationName $ApplicationName
     }
 }
