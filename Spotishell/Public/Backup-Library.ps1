@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Backup Library items to json file (FollowedArtists, SavedAlbums, SavedShows, SavedTracks)
+        Backup Library items to json file (FollowedArtists, Playlists, SavedAlbums, SavedShows, SavedTracks)
     .EXAMPLE
         PS C:\> Backup-Library -Path '.\mySpotifyBackup.json'
         Backup all Library items into '.\mySpotifyBackup.json'
@@ -20,7 +20,7 @@ function Backup-Library {
         [string]
         $Path,
 
-        [ValidateSet('All', 'FollowedArtists', 'SavedAlbums', 'SavedShows', 'SavedTracks')]
+        [ValidateSet('All', 'Playlists', 'FollowedArtists', 'SavedAlbums', 'SavedShows', 'SavedTracks')]
         [array]
         $Type = 'All',
 
@@ -28,9 +28,37 @@ function Backup-Library {
         $ApplicationName
     )
     
-#TODO autogenerate path if not provided then inform
+    #TODO autogenerate path if not provided then inform
 
     $Backup = @{}
+
+    if ($Type -contains 'Playlists' -or $Type -contains 'All') {
+        $Playlists = Get-CurrentUserPlaylists -ApplicationName $ApplicationName
+        $MyId = (Get-CurrentUserProfile).id
+
+        # process followed playlists (owner is not me)
+        $Backup.followed_playlists = foreach ($playlist in $Playlists.Where( { $_.owner.id -ne $MyId })) {
+            $playlist | Select-Object id, public
+        }
+        
+        # process my playlists (owner is me)
+        $Backup.my_playlists = foreach ($playlist in $Playlists.Where( { $_.owner.id -eq $MyId })) {
+            [PSCustomObject]@{
+                id            = $playlist.id
+                name          = $playlist.name
+                public        = $playlist.public
+                collaborative = $playlist.collaborative
+                description   = $playlist.description
+                tracks        = (Get-PlaylistItems -Id $playlist.id -ApplicationName $ApplicationName).track.uri
+                images        = foreach ($img in $playlist.images) {
+                    $ProgressPreference = 'SilentlyContinue'
+                    $imgBytes = (Invoke-WebRequest 'https://i.scdn.co/image/ab67706c0000bebbdcc818c19026811b7eaeba54').Content
+                    $ProgressPreference = 'Continue'
+                    [Convert]::ToBase64String($imgBytes)
+                }
+            }
+        }
+    }
 
     if ($Type -contains 'FollowedArtists' -or $Type -contains 'All') {
         $Backup.followed_artists = (Get-FollowedArtists -ApplicationName $ApplicationName | Select-Object name, id)
@@ -45,7 +73,7 @@ function Backup-Library {
     }
 
     if ($Type -contains 'SavedTracks' -or $Type -contains 'All') {
-        $Backup.saved_trackss = ((Get-CurrentUserSavedTracks -ApplicationName $ApplicationName).track | Select-Object name, id)
+        $Backup.saved_tracks = ((Get-CurrentUserSavedTracks -ApplicationName $ApplicationName).track | Select-Object name, id)
     }
 
     Set-Content -Path $Path -Value (ConvertTo-Json -InputObject $Backup) -Encoding Unicode
