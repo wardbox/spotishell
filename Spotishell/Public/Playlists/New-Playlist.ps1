@@ -3,7 +3,7 @@
         Create a playlist for a Spotify user. (The playlist will be empty until you add tracks.)
     .EXAMPLE
         PS C:\> New-Playlist -UserId (Get-CurrentUserProfile).id -Name 'New Playlist'
-        Create a new plalist named 'New Playlist'
+        Create a new playlist named 'New Playlist'
     .PARAMETER UserId
         Specifies the user's Spotify user ID.
     .PARAMETER Name
@@ -49,8 +49,8 @@ function New-Playlist {
 
     $BodyHashtable = @{}
     if ($Name) { $BodyHashtable.name = $Name }
-    if ($null -ne $Public) { $BodyHashtable.public = $Public.ToString().ToLower() }
-    if ($null -ne $Collaborative) { $BodyHashtable.collaborative = $Collaborative.ToString().ToLower() }
+    if ($null -ne $Public) { $BodyHashtable.public = $Public }
+    if ($null -ne $Collaborative) { $BodyHashtable.collaborative = $Collaborative }
     if ($Description) { $BodyHashtable.description = $Description }
     $Body = ConvertTo-Json $BodyHashtable -Compress
 

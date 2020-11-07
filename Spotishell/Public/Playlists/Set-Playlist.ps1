@@ -46,8 +46,8 @@ function Set-Playlist {
 
     $BodyHashtable = @{}
     if ($Name) { $BodyHashtable.name = $Name }
-    if ($null -ne $Public) { $BodyHashtable.public = $Public.ToString().ToLower() }
-    if ($null -ne $Collaborative) { $BodyHashtable.collaborative = $Collaborative.ToString().ToLower() }
+    if ($null -ne $Public) { $BodyHashtable.public = $Public }
+    if ($null -ne $Collaborative) { $BodyHashtable.collaborative = $Collaborative }
     if ($Description) { $BodyHashtable.description = $Description }
     $Body = ConvertTo-Json $BodyHashtable -Compress
 
