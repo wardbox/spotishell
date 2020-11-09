@@ -65,25 +65,25 @@ function Restore-Library {
 
     if ($Type -contains 'FollowedArtists' -or $Type -contains 'All') {
         if ($Backup.followed_artists) {
-            Add-FollowedArtist -Ids $Backup.followed_artists.id -ApplicationName $ApplicationName
+            Add-FollowedArtist -Id $Backup.followed_artists.id -ApplicationName $ApplicationName
         }
     }
 
     if ($Type -contains 'SavedAlbums' -or $Type -contains 'All') {
         if ($Backup.saved_albums) {
-            Add-CurrentUserSavedAlbum -Ids $Backup.saved_albums.id -ApplicationName $ApplicationName
+            Add-CurrentUserSavedAlbum -Id $Backup.saved_albums.id -ApplicationName $ApplicationName
         }
     }
 
     if ($Type -contains 'SavedShows' -or $Type -contains 'All') {
         if ($Backup.saved_shows) {
-            Add-CurrentUserSavedShow -Ids $Backup.saved_shows.id -ApplicationName $ApplicationName
+            Add-CurrentUserSavedShow -Id $Backup.saved_shows.id -ApplicationName $ApplicationName
         }
     }
 
     if ($Type -contains 'SavedTracks' -or $Type -contains 'All') {
         if ($Backup.saved_tracks) {
-            Add-CurrentUserSavedTrack -Ids $Backup.saved_trackss.id -ApplicationName $ApplicationName
+            Add-CurrentUserSavedTrack -Id $Backup.saved_trackss.id -ApplicationName $ApplicationName
         }
     }
 

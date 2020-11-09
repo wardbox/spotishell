@@ -6,7 +6,7 @@
         Retrieves tracks or episodes of the playlist with the Id of 'blahblahblah'
     .PARAMETER Id
         Specifies the Spotify ID for the playlist.
-    .PARAMETER Fields
+    .PARAMETER Field
         Filters for the query: a comma-separated list of the fields to return. If omitted, all fields are returned.
         For example, to get just the total number of items and the request limit: 'total,limit'
         A dot separator can be used to specify non-reoccurring fields, while parentheses can be used to specify reoccurring fields within objects.
@@ -27,7 +27,7 @@ function Get-PlaylistItems {
         $Id,
 
         [string]
-        $Fields,
+        $Field,
 
         [string]
         $Market,
@@ -40,7 +40,7 @@ function Get-PlaylistItems {
     $Uri = "https://api.spotify.com/v1/playlists/$Id/tracks?limit=100"
 
     $Query = @()
-    if ($Fields) { $Query += 'fields=' + $Fields }
+    if ($Field) { $Query += 'fields=' + $Field }
     if ($Market) { $Query += 'market=' + $Market }
 
     if ($Query.Count) { $Uri += '?' + ($Query -join '&') }

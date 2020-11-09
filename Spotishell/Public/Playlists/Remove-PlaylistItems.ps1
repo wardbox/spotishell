@@ -2,17 +2,17 @@
     .SYNOPSIS
         Remove one or more items from a user's playlist.
     .EXAMPLE
-        PS C:\> Remove-PlaylistItems -Id 'myPlaylistId' -Tracks @(@{uri = 'spotify:track:4iV5W9uYEdYUVa79Axb7Rh' }, @{uri = 'spotify:track:1301WleyT98MSxVHPZCA6M' })
+        PS C:\> Remove-PlaylistItems -Id 'myPlaylistId' -Track @(@{uri = 'spotify:track:4iV5W9uYEdYUVa79Axb7Rh' }, @{uri = 'spotify:track:1301WleyT98MSxVHPZCA6M' })
         Removes all occurrences of both tracks by specifying only uris in playlist with Id 'myPlaylistId'
     .EXAMPLE
-        PS C:\> Remove-PlaylistItems -Id 'myPlaylistId' -Tracks @(@{uri = 'spotify:track:4iV5W9uYEdYUVa79Axb7Rh'; positions = @(0, 3) }, @{uri = 'spotify:track:1301WleyT98MSxVHPZCA6M' ; positions = @(7) })
+        PS C:\> Remove-PlaylistItems -Id 'myPlaylistId' -Track @(@{uri = 'spotify:track:4iV5W9uYEdYUVa79Axb7Rh'; positions = @(0, 3) }, @{uri = 'spotify:track:1301WleyT98MSxVHPZCA6M' ; positions = @(7) })
         Removes specific occurrence of both tracks by specifying both the uris and items positions in the playlist with Id 'myPlaylistId'
     .EXAMPLE
-        PS C:\> Remove-PlaylistItems -Id 'myPlaylistId' -Tracks @(@{uri = 'spotify:track:4iV5W9uYEdYUVa79Axb7Rh' }) -SnapshotId 'mySuperPlaylistSnapshot'
+        PS C:\> Remove-PlaylistItems -Id 'myPlaylistId' -Track @(@{uri = 'spotify:track:4iV5W9uYEdYUVa79Axb7Rh' }) -SnapshotId 'mySuperPlaylistSnapshot'
         Removes all occurrences of both tracks in the specific snapshot with Id 'mySuperPlaylistSnapshot' of the playlist
     .PARAMETER Id
         Specifies the Spotify ID for the playlist.
-    .PARAMETER Tracks
+    .PARAMETER Track
         An array of objects containing Spotify URIs of the tracks and episodes to remove
         It may contains specific positions of each tracks/episodes to remove (zero-indexed)
     .PARAMETER SnapshotId
@@ -29,7 +29,7 @@ function Remove-PlaylistItems {
 
         [Parameter(Mandatory, ValueFromPipeline)]
         [array]
-        $Tracks,
+        $Track,
 
         [string]
         $SnapshotId,
@@ -41,9 +41,9 @@ function Remove-PlaylistItems {
     $Method = 'Put'
     $Uri = "https://api.spotify.com/v1/playlists/$Id/tracks"
 
-    for ($i = 0; $i -lt $Ids.Count; $i += 100) {
+    for ($i = 0; $i -lt $Track.Count; $i += 100) {
 
-        $BodyHashtable = @{tracks = $Tracks[$i..($i + 99)] }
+        $BodyHashtable = @{tracks = $Track[$i..($i + 99)] }
         if ($SnapshotId) { $BodyHashtable.snapshot_id = $SnapshotId }
         $Body = ConvertTo-Json $BodyHashtable -Compress
 
