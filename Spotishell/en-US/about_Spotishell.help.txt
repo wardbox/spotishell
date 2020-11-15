@@ -1,0 +1,22 @@
+TOPIC
+    about_Spotishell
+
+SHORT DESCRIPTION
+    A powershell module used to easily interact with the Spotify API
+
+EXAMPLES
+    New-SpotifyApplication -Name 'blah' -ClientId 'myclientId' -ClientSecret 'myClientSecret'
+    Search-Item -Query 'Linkin Park' -Type Artist
+    Get-ArtistAlbums '6XyY86QOPPrYVGvF9ch6wz'
+    Add-FollowedArtist '6XyY86QOPPrYVGvF9ch6wz'
+    Add-CurrentUserSavedAlbum '28DUZ0itKISf2sr6hlseMy'
+    Get-CurrentUserProfile
+    New-Playlist -UserId (Get-CurrentUserProfile).id -Name 'New Playlist'
+    Get-CurrentUserTopArtists
+
+KEYWORDS
+    spotify, spotify-api, api, core, mac, linux
+
+SEE ALSO
+    https://github.com/wardbox/spotishell
+    https://developer.spotify.com/documentation/
