@@ -33,7 +33,7 @@ function Backup-Library {
     $Backup = @{}
 
     if ($Type -contains 'Playlists' -or $Type -contains 'All') {
-        $Playlists = Get-CurrentUserPlaylists -ApplicationName $ApplicationName
+        $Playlists = [array](Get-CurrentUserPlaylists -ApplicationName $ApplicationName)
         $MyId = (Get-CurrentUserProfile).id
 
         # process followed playlists (owner is not me)
