@@ -83,7 +83,7 @@ function Restore-Library {
 
     if ($Type -contains 'SavedTracks' -or $Type -contains 'All') {
         if ($Backup.saved_tracks) {
-            Add-CurrentUserSavedTrack -Id $Backup.saved_trackss.id -ApplicationName $ApplicationName
+            Add-CurrentUserSavedTrack -Id $Backup.saved_tracks.id -ApplicationName $ApplicationName
         }
     }
 
