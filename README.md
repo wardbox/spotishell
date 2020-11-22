@@ -43,3 +43,6 @@ Search-Item -Query 'Bloc Party' -Type Artist
 "Music is the silence between the notes"
   - Claude Debussy
 ```
+## Help
+See [HELP](https://github.com/wardbox/spotishell/blob/master/HELP.md) for
+the synopsis, syntax, and parameters for each of the cmdlets. 
