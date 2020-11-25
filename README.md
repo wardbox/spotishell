@@ -2,8 +2,6 @@
 
 # Spotishell
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg?style=for-the-badge&logo=appveyor)](https://www.paypal.me/wardbox/1)
-
 ### A powershell module used to interact with the Spotify API.
 
 **This is a work in progress, as such, some portions may not be production quality or work at all.**
@@ -43,6 +41,10 @@ Search-Item -Query 'Bloc Party' -Type Artist
 "Music is the silence between the notes"
   - Claude Debussy
 ```
+
 ## Help
 See [HELP](https://github.com/wardbox/spotishell/blob/master/HELP.md) for
 the synopsis, syntax, and parameters for each of the cmdlets. 
+
+
+If you feel so inclined, [buy me a coffee](https://www.buymeacoffee.com/wardbox)
