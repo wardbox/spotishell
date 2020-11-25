@@ -42,4 +42,9 @@ Search-Item -Query 'Bloc Party' -Type Artist
   - Claude Debussy
 ```
 
+## Help
+See [HELP](https://github.com/wardbox/spotishell/blob/master/HELP.md) for
+the synopsis, syntax, and parameters for each of the cmdlets. 
+
+
 If you feel so inclined, [buy me a coffee](https://www.buymeacoffee.com/wardbox)
