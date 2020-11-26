@@ -31,13 +31,11 @@ function Start-Playback {
         [string]
         $DeviceId,
     
-        [Parameter(ParameterSetName = 'Context')]
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'Context')]
         [string]
         $ContextUri,
     
-        [Parameter(ParameterSetName = 'Tracks')]
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'Tracks')]
         [Array]
         $TrackUris,
 
