@@ -4,9 +4,9 @@
 
 ### A powershell module used to interact with the Spotify API.
 
-**This is a work in progress, as such, some portions may not be production quality or work at all.**
+It handles all Spotify Web API endpoints including control of players (https://developer.spotify.com/documentation/web-api/reference/)
 ## Prerequisites
-* [A spotify developer account and a registered app](https://developer.spotify.com/documentation/web-api/quick-start/)
+* [A spotify premium account and a registered app](https://developer.spotify.com/documentation/web-api/quick-start/)
 * PowerShell 5.0 or later
 * A cup of coffee or a nice tea
 
@@ -33,9 +33,10 @@ New-SpotifyApplication -ClientId "blahblahblah" -ClientSecret "blahblahblahblah"
 
 6. Give it a whirl!
 ```powershell
-Search-Item -Query 'Bloc Party' -Type Artist
+Start-Playback -TrackUris @('spotify:track:4juzduULFJiZVIcrC1tkxE') # Start Banquet of Bloc Party on the first available device
+Search-Item -Query 'Bloc Party' -Type Artist # look for Bloc Party artist
 ```
-7. Enjoy the bountiful data :^)
+7. Enjoy the music and bountiful data :^)
 
 ```
 "Music is the silence between the notes"
