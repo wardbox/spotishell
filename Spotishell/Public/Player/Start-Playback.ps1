@@ -2,8 +2,11 @@
     .SYNOPSIS
         Start a new context on the user's active device.
     .EXAMPLE
-        PS C:\> Start-Playback
-        Start playback
+        PS C:\> Start-Playback -TrackUris @('spotify:track:4juzduULFJiZVIcrC1tkxE')
+        Start playback of Banquet track
+    .EXAMPLE
+        PS C:\> Start-Playback -DeviceId ((Get-AvailableDevices)[0].id) -TrackUris @('spotify:track:4juzduULFJiZVIcrC1tkxE')
+        Start playback of Banquet track on first available device
     .PARAMETER DeviceId
         The id of the device this command is targeting.
         If not supplied, the user's currently active device is the target.
@@ -31,13 +34,11 @@ function Start-Playback {
         [string]
         $DeviceId,
     
-        [Parameter(ParameterSetName = 'Context')]
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'Context')]
         [string]
         $ContextUri,
     
-        [Parameter(ParameterSetName = 'Tracks')]
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'Tracks')]
         [Array]
         $TrackUris,
 

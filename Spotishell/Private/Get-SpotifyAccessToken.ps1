@@ -51,25 +51,29 @@ function Get-SpotifyAccessToken {
                 $Response = Invoke-WebRequest -Uri $Uri -Method $Method -Body $Body
             }
             catch {
-                Throw "Error occured during request of refreshed access token : $($PSItem[0].ToString())"
+                # Don't throw error if Refresh token is revoked or authentication failed
+                if ($_.Exception.Response.StatusCode -ne 400 -and $_.Exception.Response.StatusCode -ne 401) {
+                    Throw "Error occured during request of refreshed access token : $([int]$_.Exception.Response.StatusCode) - $($PSItem[0].ToString())"
+                }
             }
 
             # STEP 3 : Parse and save response
-            $ResponseContent = $Response.Content | ConvertFrom-Json
+            if ($Response) {
+                $ResponseContent = $Response.Content | ConvertFrom-Json
 
-            $Token = @{
-                access_token  = $ResponseContent.access_token
-                token_type    = $ResponseContent.token_type
-                scope         = $ResponseContent.scope
-                expires       = $CurrentTime.AddSeconds($ResponseContent.expires_in).ToString('u')
-                refresh_token = if ($ResponseContent.refresh_token) { $ResponseContent.refresh_token } else { $Application.Token.refresh_token }
+                $Token = @{
+                    access_token  = $ResponseContent.access_token
+                    token_type    = $ResponseContent.token_type
+                    scope         = $ResponseContent.scope
+                    expires       = $CurrentTime.AddSeconds($ResponseContent.expires_in).ToString('u')
+                    refresh_token = if ($ResponseContent.refresh_token) { $ResponseContent.refresh_token } else { $Application.Token.refresh_token }
+                }
+
+                Set-SpotifyApplication -Name $ApplicationName -Token $Token
+                Write-Verbose 'Successfully saved Refreshed Token'
+
+                return $Token.access_token
             }
-
-            Set-SpotifyApplication -Name $ApplicationName -Token $Token
-            Write-Verbose 'Successfully saved Refreshed Token'
-
-            return $Token.access_token
-
         }
     }
 
