@@ -36,7 +36,11 @@ function Send-PlaylistCoverImage {
     $Uri = "https://api.spotify.com/v1/playlists/$Id/images"
 
     if ($ImagePath) {
-        $Body = [Convert]::ToBase64String((Get-Content $ImagePath -Encoding Byte))
+        if ($PSVersionTable.PSVersion.Major -ge 7) {
+            $Body = [Convert]::ToBase64String((Get-Content $ImagePath -AsByteStream))
+        } else {
+            $Body = [Convert]::ToBase64String((Get-Content $ImagePath -Encoding Byte))
+        }
     }
 
     if ($ImageBase64) {
