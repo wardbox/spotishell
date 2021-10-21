@@ -8,6 +8,10 @@
         Check that Store folder exists
 #>
 function Get-StorePath {
+    if ($null -ne $env:SPOTISHELL_STORE_PATH) {
+        return $env:SPOTISHELL_STORE_PATH
+    }
+
     if ($IsMacOS -or $IsLinux) {
         return $home + '/.spotishell/'
     }
