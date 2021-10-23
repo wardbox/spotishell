@@ -117,6 +117,14 @@ function Get-SpotifyAccessToken {
     $Uri += "&redirect_uri=$EncodedRedirectUri"
     $Uri += "&state=$State"
     $Uri += "&scope=$EncodedScopes"
+    
+
+    # if running in a Docker container
+    if ($env:POWERSHELL_DISTRIBUTION_CHANNEL.StartsWith('PSDocker')){
+        # then Enable NoGUI
+        $NoGUI = $true
+        Write-Verbose 'Running into a Docker Container : switch to manual authorization'
+    }
 
     if ($NoGUI) {
         # if no GUI so no HTTP server
