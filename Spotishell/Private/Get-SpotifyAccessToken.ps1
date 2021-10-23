@@ -7,6 +7,8 @@
     .EXAMPLE
         PS C:\> Get-SpotifyAccessToken -ApplicationName 'dev'
         Looks for a saved credential named "dev" and tries to get an access token with it's credentials
+    .PARAMETER NoGUI
+        Forces manual Authorization Code retrieval (user needs to copy-paste url in a web browser and copy paste back authorization result)
     .PARAMETER ApplicationName
         Specifies the Spotify Application Name (otherwise default is used)
 #>
@@ -14,8 +16,11 @@ function Get-SpotifyAccessToken {
 
     [CmdletBinding()]
     param (
+        [switch]
+        $NoGUI,
+
         [String]
-        $ApplicationName
+        $ApplicationName        
     )
 
     # Get Application from the Store
@@ -112,36 +117,56 @@ function Get-SpotifyAccessToken {
     $Uri += "&redirect_uri=$EncodedRedirectUri"
     $Uri += "&state=$State"
     $Uri += "&scope=$EncodedScopes"
+    
 
-    # Create an Http Server
-    $Listener = [System.Net.HttpListener]::new() 
-    $Prefix = $Application.RedirectUri.Substring(0, $Application.RedirectUri.LastIndexOf('/') + 1) # keep uri until the last '/' included
-    $Listener.Prefixes.Add($Prefix)
-    $Listener.Start()
-    if ($Listener.IsListening) {
-        Write-Verbose 'HTTP Server is ready to receive Authorization Code'
-        $HttpServerReady = $true
+    # if running in a Docker container
+    if ($env:POWERSHELL_DISTRIBUTION_CHANNEL.StartsWith('PSDocker')){
+        # then Enable NoGUI
+        $NoGUI = $true
+        Write-Verbose 'Running into a Docker Container : switch to manual authorization'
     }
-    else {
-        Write-Verbose 'HTTP Server is not ready. Fall back to manual method'
+
+    if ($NoGUI) {
+        # if no GUI so no HTTP server
         $HttpServerReady = $false
     }
-
+    else {
+        # Create an Http Server
+        $Listener = [System.Net.HttpListener]::new()
+        $Prefix = $Application.RedirectUri.Substring(0, $Application.RedirectUri.LastIndexOf('/') + 1) # keep uri until the last '/' included
+        $Listener.Prefixes.Add($Prefix)
+        $Listener.Start()
+        if ($Listener.IsListening) {
+            Write-Verbose 'HTTP Server is ready to receive Authorization Code'
+            $HttpServerReady = $true
+        }
+        else {
+            Write-Verbose 'HTTP Server is not ready. Fall back to manual method'
+            $HttpServerReady = $false
+        }
+    }
 
     # STEP 2 : Open browser to get Authorization
-    if ($IsMacOS) {
-        Write-Verbose 'Open Mac OS browser'
-        open $URI
-    }
-    elseif ($IsLinux) {
-        Write-Verbose 'Open Linux browser'
-        Write-Verbose 'You should have a freedesktop.org-compliant desktop'
-        Start-Process xdg-open $URI
+    if ($NoGUI) {
+        # if no GUI, ask the user to open the Uri elsewhere
+        Write-Host 'Please, copy-paste the following URL into your web browser : '
+        Write-Host $Uri
     }
     else {
-        # So we are on Windows
-        Write-Verbose 'Open Windows browser'
-        rundll32 url.dll, FileProtocolHandler $URI
+        if ($IsMacOS) {
+            Write-Host 'Opening Mac OS browser'
+            open $Uri
+        }
+        elseif ($IsLinux) {
+            Write-Host 'Opening Linux browser'
+            Write-Host 'You should have a freedesktop.org-compliant desktop'
+            Start-Process xdg-open $Uri
+        }
+        else {
+            # So we are on Windows
+            Write-Host 'Opening Windows browser'
+            rundll32 url.dll, FileProtocolHandler $Uri
+        }
     }
 
 
@@ -175,7 +200,7 @@ function Get-SpotifyAccessToken {
         $Listener.Stop()
     }
     else {
-        $Response = Read-Host 'Paste the entire URL that it redirects you to'
+        $Response = Read-Host 'Paste here the entire URL that it redirects you to'
         $Response = [System.Uri]$Response
     }
 
