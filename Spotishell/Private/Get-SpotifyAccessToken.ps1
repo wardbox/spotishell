@@ -150,7 +150,7 @@ function Get-SpotifyAccessToken {
     if ($NoGUI) {
         # if no GUI, ask the user to open the Uri elsewhere
         Write-Host 'Please, copy-paste the following URL into your web browser : '
-        Write-Host $Uri
+        Write-Host $Uri -ForegroundColor Yellow
     }
     else {
         if ($IsMacOS) {
