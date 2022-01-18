@@ -18,5 +18,10 @@ function Initialize-SpotifyApplication {
         $ApplicationName
     )
 
-    Get-SpotifyAccessToken -ApplicationName $ApplicationName
+    if ($null -ne (Get-SpotifyAccessToken -ApplicationName $ApplicationName) -and $null -ne (Get-CurrentUserProfile -ApplicationName $ApplicationName)) {
+        Write-Host 'Your Spotify Application is correctly initialized. You''re good to go!' -BackgroundColor Green -ForegroundColor Black
+    }
+    else {
+        Write-Host 'Something wrong happened during initialization. Please, try again.' -BackgroundColor Red -ForegroundColor Black
+    }
 }
