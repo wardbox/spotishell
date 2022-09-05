@@ -50,11 +50,14 @@ function Backup-Library {
                 collaborative = $playlist.collaborative
                 description   = $playlist.description
                 tracks        = (Get-PlaylistItems -Id $playlist.id -ApplicationName $ApplicationName).track.uri
-                images        = foreach ($img in $playlist.images) {
-                    $ProgressPreference = 'SilentlyContinue'
-                    $imgBytes = (Invoke-WebRequest 'https://i.scdn.co/image/ab67706c0000bebbdcc818c19026811b7eaeba54').Content
-                    $ProgressPreference = 'Continue'
-                    [Convert]::ToBase64String($imgBytes)
+                images        = &{
+                    $image = ($playlist.images | Sort-Object -Property height -Descending)[0]
+                    if ($null -ne $image) {
+                        $ProgressPreference = 'SilentlyContinue'
+                        $imgBytes = (Invoke-WebRequest $image.url).Content
+                        $ProgressPreference = 'Continue'
+                        [Convert]::ToBase64String($imgBytes)
+                    }
                 }
             }
         }
