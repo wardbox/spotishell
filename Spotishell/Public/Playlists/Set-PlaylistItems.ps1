@@ -32,12 +32,16 @@ function Set-PlaylistItems {
     $Uri = "https://api.spotify.com/v1/playlists/$Id/tracks"
 
     if ($Uris) {
-        for ($i = 0; $i -lt $Uris.Count; $i += 100) {
 
-            $BodyHashtable = @{uris = $Uris[$i..($i + 99)] }
-            $Body = ConvertTo-Json $BodyHashtable -Compress
-    
-            Send-SpotifyCall -Method $Method -Uri $Uri -Body $Body -ApplicationName $ApplicationName
+        # process 100 first items
+        $BodyHashtable = @{uris = $Uris[0..99] }
+        $Body = ConvertTo-Json $BodyHashtable -Compress
+
+        Send-SpotifyCall -Method $Method -Uri $Uri -Body $Body -ApplicationName $ApplicationName
+
+        # if there is more than 100 items add them to the end of playlist
+        if ($Uris.Count -gt 100) {
+            Add-PlaylistItem -Id $Id -ItemId $Uris[100..$($Uris.Count-1)] -ApplicationName $ApplicationName
         }
     }
     else {
