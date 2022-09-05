@@ -11,6 +11,7 @@
 #>
 function Get-UserProfile {
     param (
+        [Parameter(Mandatory)]
         [String]
         $UserId,
 
