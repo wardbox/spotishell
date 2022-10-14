@@ -38,7 +38,7 @@ function Remove-PlaylistItems {
         $ApplicationName
     )
 
-    $Method = 'Put'
+    $Method = 'Delete'
     $Uri = "https://api.spotify.com/v1/playlists/$Id/tracks"
 
     for ($i = 0; $i -lt $Track.Count; $i += 100) {
