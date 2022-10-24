@@ -2,13 +2,13 @@
     .SYNOPSIS
         Get the saved status for the selected tracks.
     .EXAMPLE
-        PS C:\> Get-SavedStatusTrack -Id 7na8xV9Zf1IOQtTFbvbCKO
+        PS C:\> Test-UserSavedTrack -Id 7na8xV9Zf1IOQtTFbvbCKO
     .PARAMETER Id
         One or more Track Ids
     .PARAMETER ApplicationName
         Specifies the Spotify Application Name (otherwise default is used)
 #>
-function Get-SavedStatusTrack {
+function Test-UserSavedTrack {
 	param (
 		[Parameter(Mandatory, ValueFromPipeline)]
 		[ValidateNotNullOrEmpty()]
