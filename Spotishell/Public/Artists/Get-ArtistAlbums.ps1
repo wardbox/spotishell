@@ -50,7 +50,7 @@ function Get-ArtistAlbums {
         if ($AppearsOn) { $IncludeGroups += 'appears_on' }
         if ($Compilation) { $IncludeGroups += 'compilation' }
 
-        Uri += '&' + ($IncludeGroups -join '%2C')
+        $Uri += '&' + ($IncludeGroups -join '%2C')
     }
 
     # build a fake Response to start the machine
