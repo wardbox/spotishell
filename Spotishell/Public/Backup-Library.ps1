@@ -34,7 +34,7 @@ function Backup-Library {
 
     if ($Type -contains 'Playlists' -or $Type -contains 'All') {
         $Playlists = [array](Get-CurrentUserPlaylists -ApplicationName $ApplicationName)
-        $MyId = (Get-CurrentUserProfile).id
+        $MyId = (Get-CurrentUserProfile -ApplicationName $ApplicationName).id
 
         # process followed playlists (owner is not me)
         $Backup.followed_playlists = foreach ($playlist in $Playlists.Where( { $_.owner.id -ne $MyId })) {
@@ -50,9 +50,9 @@ function Backup-Library {
                 collaborative = $playlist.collaborative
                 description   = $playlist.description
                 tracks        = (Get-PlaylistItems -Id $playlist.id -ApplicationName $ApplicationName).track.uri
-                images        = &{
-                    $image = ($playlist.images | Sort-Object -Property height -Descending)[0]
-                    if ($null -ne $image) {
+                image         = & {
+                    if ($null -ne $playlist.images) {
+                        $image = ($playlist.images | Sort-Object -Property height -Descending)[0]
                         $ProgressPreference = 'SilentlyContinue'
                         $imgBytes = (Invoke-WebRequest $image.url).Content
                         $ProgressPreference = 'Continue'
@@ -79,5 +79,5 @@ function Backup-Library {
         $Backup.saved_tracks = ((Get-CurrentUserSavedTracks -ApplicationName $ApplicationName).track | Select-Object name, id)
     }
 
-    Set-Content -Path $Path -Value (ConvertTo-Json -InputObject $Backup) -Encoding Unicode
+    Set-Content -Path $Path -Value (ConvertTo-Json -Depth 10 -InputObject $Backup) -Encoding UTF8
 }
