@@ -28,7 +28,7 @@ function Restore-Library {
         $ApplicationName
     )
 
-    $Backup = Get-Content -Path $Path -Raw | ConvertFrom-Json
+    $Backup = Get-Content -Path $Path -Encoding UTF8 -Raw | ConvertFrom-Json
 
     if ($Type -contains 'Playlists' -or $Type -contains 'All') {
         $MyId = (Get-CurrentUserProfile -ApplicationName $ApplicationName).id

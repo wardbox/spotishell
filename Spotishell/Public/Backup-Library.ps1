@@ -79,5 +79,5 @@ function Backup-Library {
         $Backup.saved_tracks = ((Get-CurrentUserSavedTracks -ApplicationName $ApplicationName).track | Select-Object name, id)
     }
 
-    Set-Content -Path $Path -Value (ConvertTo-Json -Depth 10 -InputObject $Backup) -Encoding Unicode
+    Set-Content -Path $Path -Value (ConvertTo-Json -Depth 10 -InputObject $Backup) -Encoding UTF8
 }
