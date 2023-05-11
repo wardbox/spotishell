@@ -28,7 +28,7 @@ function Set-ShufflePlayback {
     )
 
     $Method = 'Put'
-    $Uri = 'https://api.spotify.com/v1/me/player/shuffle?state=' + $State.ToLower()
+    $Uri = 'https://api.spotify.com/v1/me/player/shuffle?state=' + $State.ToString().ToLower()
     if ($DeviceId) { $Uri += '&device_id=' + $DeviceId }
 
     Send-SpotifyCall -Method $Method -Uri $Uri -ApplicationName $ApplicationName
