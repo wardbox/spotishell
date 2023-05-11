@@ -49,7 +49,7 @@ function Set-Playlist {
     if ($null -ne $Public) { $BodyHashtable.public = $Public }
     if ($null -ne $Collaborative) { $BodyHashtable.collaborative = $Collaborative }
     if ($Description) { $BodyHashtable.description = $Description }
-    $Body = ConvertTo-Json $BodyHashtable -Compress
+    $Body = Get-NonAsciiCharEscaped (ConvertTo-Json $BodyHashtable -Compress)
 
     Send-SpotifyCall -Method $Method -Uri $Uri -Body $Body -ApplicationName $ApplicationName
 }
