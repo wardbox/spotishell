@@ -34,7 +34,7 @@ function Backup-Library {
 
     if ($Type -contains 'Playlists' -or $Type -contains 'All') {
         $Playlists = [array](Get-CurrentUserPlaylists -ApplicationName $ApplicationName)
-        $MyId = (Get-CurrentUserProfile).id
+        $MyId = (Get-CurrentUserProfile -ApplicationName $ApplicationName).id
 
         # process followed playlists (owner is not me)
         $Backup.followed_playlists = foreach ($playlist in $Playlists.Where( { $_.owner.id -ne $MyId })) {
