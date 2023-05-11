@@ -57,9 +57,7 @@ function Restore-Library {
             # set tracks
             Set-PlaylistItems -Id $Id -Uris $playlist.tracks | Out-Null
             # set image
-            foreach ($img in $playlist.images) {
-                if ($img) { Send-PlaylistCoverImage -Id $Id -ImageBase64 $img | Out-Null }
-            }
+            if ($playlist.image) { Send-PlaylistCoverImage -Id $Id -ImageBase64 $playlist.image | Out-Null }
         }
     }
 

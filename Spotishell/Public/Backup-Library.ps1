@@ -50,9 +50,9 @@ function Backup-Library {
                 collaborative = $playlist.collaborative
                 description   = $playlist.description
                 tracks        = (Get-PlaylistItems -Id $playlist.id -ApplicationName $ApplicationName).track.uri
-                images        = &{
-                    $image = ($playlist.images | Sort-Object -Property height -Descending)[0]
-                    if ($null -ne $image) {
+                image         = & {
+                    if ($null -ne $playlist.images) {
+                        $image = ($playlist.images | Sort-Object -Property height -Descending)[0]
                         $ProgressPreference = 'SilentlyContinue'
                         $imgBytes = (Invoke-WebRequest $image.url).Content
                         $ProgressPreference = 'Continue'
