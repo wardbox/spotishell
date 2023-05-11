@@ -31,15 +31,15 @@ function Restore-Library {
     $Backup = Get-Content -Path $Path -Raw | ConvertFrom-Json
 
     if ($Type -contains 'Playlists' -or $Type -contains 'All') {
-        $MyId = (Get-CurrentUserProfile).id
+        $MyId = (Get-CurrentUserProfile -ApplicationName $ApplicationName).id
 
         # process followed playlists
         foreach ($playlist in $Backup.followed_playlists) {
-            Add-FollowedPlaylist -Id $playlist.id -Public $playlist.public
+            Add-FollowedPlaylist -Id $playlist.id -Public $playlist.public -ApplicationName $ApplicationName
         }
 
         # process my playlists
-        $MyPlaylists = Get-CurrentUserPlaylists
+        $MyPlaylists = Get-CurrentUserPlaylists -ApplicationName $ApplicationName
         foreach ($playlist in $Backup.my_playlists) {
             # if playlist with this id exists
             if ($MyPlaylists.id -contains $playlist.id) {
@@ -55,7 +55,7 @@ function Restore-Library {
                 $Id = (New-Playlist -UserId $MyId -Name $playlist.name -Public $playlist.public -Collaborative $playlist.collaborative -Description $playlist.description -ApplicationName $ApplicationName).id
             }
             # set tracks
-            Set-PlaylistItems -Id $Id -Uris $playlist.tracks | Out-Null
+            Set-PlaylistItems -Id $Id -Uris $playlist.tracks -ApplicationName $ApplicationName | Out-Null
             # set image
             if ($playlist.image) { Send-PlaylistCoverImage -Id $Id -ImageBase64 $playlist.image | Out-Null }
         }
