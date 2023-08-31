@@ -14,11 +14,32 @@
 function Get-RecentlyPlayedTracks {
     param(
         [string]
-        $ApplicationName
+        $ApplicationName,
+
+        [int]
+        $Limit = 50,
+
+        [nullable[datetime]]
+        $BeforeTimestamp = $null,
+
+        [nullable[datetime]]
+        $AfterTimestamp = $null
     )
 
+    if ($BeforeTimestamp -and $AfterTimestamp) {
+        throw "Use either `BeforeTimestamp` or `AfterTimestamp`. Not both."
+    }
+
     $Method = 'Get'
-    $Uri = 'https://api.spotify.com/v1/me/player/recently-played?limit=50'
+    $Uri = "https://api.spotify.com/v1/me/player/recently-played?limit=$Limit"
+
+    if ($BeforeTimestamp) {
+        $Uri += '&before=' + (Get-Date ($BeforeTimestamp.ToUniversalTime()) -UFormat %s)
+    }
+
+    if ($AfterTimestamp) {
+        $Uri += '&after=' + (Get-Date ($AfterTimestamp.ToUniversalTime()) -UFormat %s)
+    }
 
     $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ApplicationName $ApplicationName
     $Response.items.track
