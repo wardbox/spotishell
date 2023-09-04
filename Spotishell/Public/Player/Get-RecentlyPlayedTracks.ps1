@@ -14,21 +14,26 @@
 function Get-RecentlyPlayedTracks {
     param(
         [string]
+        [Parameter(ParameterSetName = 'All')]
+        [Parameter(ParameterSetName = 'BeforeTimestamp')]
+        [Parameter(ParameterSetName = 'AfterTimestamp')]
         $ApplicationName,
 
         [int]
+        [Parameter(ParameterSetName = 'All')]
+        [Parameter(ParameterSetName = 'BeforeTimestamp')]
+        [Parameter(ParameterSetName = 'AfterTimestamp')]
+        [ValidateRange(1, 50)]
         $Limit = 50,
 
         [nullable[datetime]]
+        [Parameter(ParameterSetName = 'BeforeTimestamp')]
         $BeforeTimestamp = $null,
 
         [nullable[datetime]]
+        [Parameter(ParameterSetName = 'AfterTimestamp')]
         $AfterTimestamp = $null
     )
-
-    if ($BeforeTimestamp -and $AfterTimestamp) {
-        throw "Use either `BeforeTimestamp` or `AfterTimestamp`. Not both."
-    }
 
     $Method = 'Get'
     $Uri = "https://api.spotify.com/v1/me/player/recently-played?limit=$Limit"
