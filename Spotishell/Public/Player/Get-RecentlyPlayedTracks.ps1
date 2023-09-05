@@ -6,21 +6,29 @@
         Retrieves the recently played tracks
     .PARAMETER ApplicationName
         Specifies the Spotify Application Name (otherwise default is used)
+    .PARAMETER Limit
+        Specifies how many entries to fetch. 
+        Allowed range is 1 through 50.
+    .PARAMETER BeforeTimestamp
+        Returns all items before (but not including) this cursor position. If before is specified, after must not be specified.
+    .PARAMETER AfterTimestamp
+        Returns all items after (but not including) this cursor position. If after is specified, before must not be specified.
     .NOTES
         Returns the most recent 50 tracks played by a user.
         Note that a track currently playing will not be visible in play history until it has completed.
         A track must be played for more than 30 seconds to be included in play history.
 #>
 function Get-RecentlyPlayedTracks {
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
         [string]
-        [Parameter(ParameterSetName = 'All')]
+        [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'BeforeTimestamp')]
         [Parameter(ParameterSetName = 'AfterTimestamp')]
         $ApplicationName,
 
         [int]
-        [Parameter(ParameterSetName = 'All')]
+        [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'BeforeTimestamp')]
         [Parameter(ParameterSetName = 'AfterTimestamp')]
         [ValidateRange(1, 50)]
