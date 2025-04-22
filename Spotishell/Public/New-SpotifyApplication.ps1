@@ -33,7 +33,7 @@ function New-SpotifyApplication {
         $ClientSecret,
 
         [String]
-        $RedirectUri = 'http://localhost:8080/spotishell'
+        $RedirectUri = 'http://127.0.0.1:8080/spotishell'
     )
 
     $StorePath = Get-StorePath
