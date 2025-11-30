@@ -156,6 +156,10 @@ function Get-SpotifyAccessToken {
     # Generate PKCE challenge
     $Pkce = New-PkceChallenge
 
+    # Save code_verifier to Application for use in token exchange
+    Set-SpotifyApplication -Name $ApplicationName -CodeVerifier $Pkce.Verifier
+    $Application = Get-SpotifyApplication -Name $ApplicationName
+
     $Uri = 'https://accounts.spotify.com/authorize'
     $Uri += "?client_id=$($Application.ClientId)"
     $Uri += '&response_type=code'
@@ -289,7 +293,7 @@ function Get-SpotifyAccessToken {
         code          = $AuthorizationCode
         redirect_uri  = $Application.RedirectUri
         client_id     = $Application.ClientId
-        code_verifier = $Pkce.Verifier  # PKCE: use code_verifier instead of client_secret
+        code_verifier = $Application.CodeVerifier  # PKCE: use stored code_verifier
     }
 
     # STEP 2 : Make request to the Spotify Accounts service
