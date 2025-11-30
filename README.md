@@ -2,7 +2,7 @@
 
 # Spotishell
 
-### A powershell module used to interact with the Spotify API.
+## A powershell module used to interact with the Spotify API.
 
 It handles all Spotify Web API endpoints including control of players (https://developer.spotify.com/documentation/web-api/reference/)
 ## Prerequisites
