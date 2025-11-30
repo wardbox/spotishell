@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: PSScriptAnalyzer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+          $results = Invoke-ScriptAnalyzer -Path ./Spotishell -Recurse -Settings ./PSScriptAnalyzerSettings.psd1
+          $results | Format-Table -AutoSize
+          if ($results) {
+            Write-Error "PSScriptAnalyzer found $($results.Count) issue(s)"
+            exit 1
+          }
+
+  test:
+    name: Pester Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Pester Tests
+        shell: pwsh
+        run: |
+          Install-Module -Name Pester -Force -Scope CurrentUser -MinimumVersion 5.0.0
+          Import-Module Pester
+
+          $config = New-PesterConfiguration
+          $config.Run.Path = './Tests'
+          $config.Run.Exit = $true
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputPath = 'testResults.xml'
+          $config.Output.Verbosity = 'Detailed'
+
+          Invoke-Pester -Configuration $config
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.os }}
+          path: testResults.xml
+
+  module-validation:
+    name: Module Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Module Manifest
+        shell: pwsh
+        run: |
+          $manifest = Test-ModuleManifest -Path ./Spotishell/Spotishell.psd1 -ErrorAction Stop
+          Write-Host "Module: $($manifest.Name)"
+          Write-Host "Version: $($manifest.Version)"
+          Write-Host "Description: $($manifest.Description)"
+
+      - name: Test Module Import
+        shell: pwsh
+        run: |
+          Import-Module ./Spotishell/Spotishell.psd1 -Force -ErrorAction Stop
+          $commands = Get-Command -Module Spotishell
+          Write-Host "Exported $($commands.Count) commands"
+          if ($commands.Count -eq 0) {
+            Write-Error "No commands exported from module"
+            exit 1
+          }
