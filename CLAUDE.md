@@ -29,8 +29,8 @@ Get-Help <CmdletName> -Full
 
 ### Core Private Functions
 - `Send-SpotifyCall.ps1` - Central API caller that handles all HTTP requests to Spotify, including rate limit handling (429 responses with retry-after)
-- `Get-SpotifyAccessToken.ps1` - Implements OAuth Authorization Code Flow, handles token refresh, spawns local HTTP listener for OAuth callback
-- `Get-StorePath.ps1` - Returns OS-appropriate credential storage path (`~/.spotishell/` on Unix, `%LOCALAPPDATA%\spotishell\` on Windows). Can be overridden via `SPOTISHELL_STORE_PATH` env var
+- `Get-SpotifyAccessToken.ps1` - Implements OAuth Authorization Code Flow with PKCE, handles token refresh, spawns local HTTP listener for OAuth callback
+- `Get-StorePath.ps1` - Returns OS-appropriate credential storage path (`~/.spotishell/` on Unix, `%LOCALAPPDATA%\spotishell\` on Windows). It can be overridden via `SPOTISHELL_STORE_PATH` env var
 
 ### Authentication Flow
 1. User creates app with `New-SpotifyApplication -ClientId <id> -ClientSecret <secret>`

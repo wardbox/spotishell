@@ -24,16 +24,24 @@ function New-PkceChallenge {
     # Generate code_verifier: 64 random bytes -> base64url encoded (results in 86 chars)
     $RandomBytes = [byte[]]::new(64)
     $Rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
-    $Rng.GetBytes($RandomBytes)
-    $Rng.Dispose()
+    try {
+        $Rng.GetBytes($RandomBytes)
+    }
+    finally {
+        $Rng.Dispose()
+    }
 
     # Base64url encode (no padding, - instead of +, _ instead of /)
     $CodeVerifier = [Convert]::ToBase64String($RandomBytes) -replace '\+', '-' -replace '/', '_' -replace '=', ''
 
     # Generate code_challenge: SHA256 hash of verifier, then base64url encode
     $Sha256 = [System.Security.Cryptography.SHA256]::Create()
-    $ChallengeBytes = $Sha256.ComputeHash([System.Text.Encoding]::ASCII.GetBytes($CodeVerifier))
-    $Sha256.Dispose()
+    try {
+        $ChallengeBytes = $Sha256.ComputeHash([System.Text.Encoding]::ASCII.GetBytes($CodeVerifier))
+    }
+    finally {
+        $Sha256.Dispose()
+    }
 
     $CodeChallenge = [Convert]::ToBase64String($ChallengeBytes) -replace '\+', '-' -replace '/', '_' -replace '=', ''
 
@@ -73,11 +81,14 @@ function Get-SpotifyAccessToken {
             # STEP 1 : Prepare
             $Uri = 'https://accounts.spotify.com/api/token'
             $Method = 'Post'
+            # Note: Per PKCE spec, client_secret is not required for refresh tokens.
+            # However, we include it for compatibility with tokens issued before PKCE migration
+            # and because Spotify's API accepts it without issue.
             $Body = @{
                 grant_type    = 'refresh_token'
                 refresh_token = $Application.Token.refresh_token
-                client_id     = $Application.ClientId # alternative way to send the client id and secret
-                client_secret = $Application.ClientSecret # alternative way to send the client id and secret
+                client_id     = $Application.ClientId
+                client_secret = $Application.ClientSecret
             }
 
             # STEP 2 : Make request to the Spotify Accounts service
