@@ -320,5 +320,8 @@ function Get-SpotifyAccessToken {
     Set-SpotifyApplication -Name $ApplicationName -Token $Token
     Write-Verbose 'Successfully saved Token'
 
+    # Clear the code verifier as it's no longer needed after successful token exchange
+    Set-SpotifyApplication -Name $ApplicationName -CodeVerifier ''
+
     return $Token.access_token
 }
