@@ -81,14 +81,15 @@ function Get-SpotifyAccessToken {
             # STEP 1 : Prepare
             $Uri = 'https://accounts.spotify.com/api/token'
             $Method = 'Post'
-            # Note: Per PKCE spec, client_secret is not required for refresh tokens.
-            # However, we include it for compatibility with tokens issued before PKCE migration
-            # and because Spotify's API accepts it without issue.
+            # Per PKCE spec, client_secret is not required for refresh tokens.
+            # Only include it if present for backward compatibility with confidential clients.
             $Body = @{
                 grant_type    = 'refresh_token'
                 refresh_token = $Application.Token.refresh_token
                 client_id     = $Application.ClientId
-                client_secret = $Application.ClientSecret
+            }
+            if ($Application.ClientSecret) {
+                $Body.client_secret = $Application.ClientSecret
             }
 
             # STEP 2 : Make request to the Spotify Accounts service
@@ -286,6 +287,10 @@ function Get-SpotifyAccessToken {
 
     # ------------------------------ Token retrieval ------------------------------
     # STEP 1 : Prepare
+    if (-not $Application.CodeVerifier) {
+        Throw 'CodeVerifier is missing; please rerun Get-SpotifyAccessToken to initiate a fresh PKCE authorization.'
+    }
+
     $Uri = 'https://accounts.spotify.com/api/token'
     $Method = 'Post'
     $Body = @{
