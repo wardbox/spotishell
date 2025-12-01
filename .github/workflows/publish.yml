@@ -1,0 +1,75 @@
+name: Publish to PowerShell Gallery
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    name: Publish Module
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Release Tag
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $manifest = Test-ModuleManifest -Path ./Spotishell/Spotishell.psd1
+          $moduleVersion = $manifest.Version.ToString()
+
+          # Strip 'v' prefix if present
+          $tagVersion = $tag -replace '^v', ''
+
+          Write-Host "Release tag: $tag"
+          Write-Host "Tag version: $tagVersion"
+          Write-Host "Module version: $moduleVersion"
+
+          if ($tagVersion -ne $moduleVersion) {
+            Write-Error "Version mismatch! Tag '$tagVersion' does not match module version '$moduleVersion'"
+            Write-Error "Update ModuleVersion in Spotishell.psd1 to match the release tag"
+            exit 1
+          }
+
+          Write-Host "Version validation passed!"
+
+      - name: Run Tests
+        shell: pwsh
+        run: |
+          Install-Module -Name Pester -Force -Scope CurrentUser -MinimumVersion 5.0.0
+          Import-Module Pester
+
+          $config = New-PesterConfiguration
+          $config.Run.Path = './Tests'
+          $config.Run.Exit = $true
+          $config.Output.Verbosity = 'Detailed'
+
+          Invoke-Pester -Configuration $config
+
+      - name: Publish to PowerShell Gallery
+        shell: pwsh
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          $modulePath = './Spotishell'
+          $manifestPath = './Spotishell/Spotishell.psd1'
+
+          if (-not (Test-Path $modulePath -PathType Container)) {
+            Write-Error "Module directory not found: $modulePath"
+            exit 1
+          }
+
+          if (-not (Test-Path $manifestPath -PathType Leaf)) {
+            Write-Error "Module manifest not found: $manifestPath"
+            exit 1
+          }
+
+          if (-not $env:PSGALLERY_API_KEY) {
+            Write-Error "PSGALLERY_API_KEY secret is not set"
+            exit 1
+          }
+
+          Write-Host "Publishing Spotishell to PowerShell Gallery..."
+          Publish-Module -Path $modulePath -NuGetApiKey $env:PSGALLERY_API_KEY -Verbose -ErrorAction Stop
+          Write-Host "Successfully published to PowerShell Gallery!"
