@@ -164,6 +164,9 @@ Describe 'Private Functions' {
 
 Describe 'Application Management' {
     BeforeAll {
+        # Dot-source private function needed for path resolution
+        . (Join-Path $PrivatePath 'Get-StorePath.ps1')
+
         # Use a temporary store path for testing
         $testStorePath = Join-Path $TestDrive 'spotishell-test'
         New-Item -Path $testStorePath -ItemType Directory -Force | Out-Null
