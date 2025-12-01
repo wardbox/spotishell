@@ -43,17 +43,46 @@ BeforeAll {
 
     # Setup application and test playlist if credentials exist
     if (-not $script:SkipTests) {
-        # Check if application exists, create if not
-        $app = $null
-        try {
-            $app = Get-SpotifyApplication -Name 'integration-test' -ErrorAction SilentlyContinue
-        }
-        catch {
-            # Application doesn't exist, will create below
-        }
+        # For CI: if refresh token is provided, create the credential file directly
+        # This allows non-interactive token refresh
+        if ($env:SPOTIFY_REFRESH_TOKEN) {
+            # Ensure store directory exists
+            $StorePath = if ($env:SPOTISHELL_STORE_PATH) { $env:SPOTISHELL_STORE_PATH }
+                         elseif ($IsWindows -or $PSVersionTable.PSVersion.Major -lt 6) { Join-Path $env:LOCALAPPDATA 'spotishell' }
+                         else { Join-Path $HOME '.spotishell' }
 
-        if (-not $app) {
-            New-SpotifyApplication -Name 'integration-test' -ClientId $env:SPOTIFY_CLIENT_ID -ClientSecret $env:SPOTIFY_CLIENT_SECRET
+            if (-not (Test-Path $StorePath)) {
+                New-Item -Path $StorePath -ItemType Directory -Force | Out-Null
+            }
+
+            # Create application with pre-authorized refresh token
+            $AppFile = Join-Path $StorePath 'integration-test.json'
+            @{
+                Name         = 'integration-test'
+                ClientId     = $env:SPOTIFY_CLIENT_ID
+                ClientSecret = $env:SPOTIFY_CLIENT_SECRET
+                RedirectUri  = 'http://127.0.0.1:8080/spotishell'
+                Token        = @{
+                    refresh_token = $env:SPOTIFY_REFRESH_TOKEN
+                    expires       = '1970-01-01 00:00:00Z'  # Force refresh on first use
+                }
+            } | ConvertTo-Json -Depth 10 | Set-Content -Path $AppFile -Encoding UTF8
+
+            Write-Host "Created integration-test application with pre-authorized refresh token"
+        }
+        else {
+            # Local development: check if application exists, create if not
+            $app = $null
+            try {
+                $app = Get-SpotifyApplication -Name 'integration-test' -ErrorAction SilentlyContinue
+            }
+            catch {
+                # Application doesn't exist, will create below
+            }
+
+            if (-not $app) {
+                New-SpotifyApplication -Name 'integration-test' -ClientId $env:SPOTIFY_CLIENT_ID -ClientSecret $env:SPOTIFY_CLIENT_SECRET
+            }
         }
 
         # Get current user for playlist creation
