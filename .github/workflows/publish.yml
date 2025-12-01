@@ -52,11 +52,24 @@ jobs:
         env:
           PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
         run: |
+          $modulePath = './Spotishell'
+          $manifestPath = './Spotishell/Spotishell.psd1'
+
+          if (-not (Test-Path $modulePath -PathType Container)) {
+            Write-Error "Module directory not found: $modulePath"
+            exit 1
+          }
+
+          if (-not (Test-Path $manifestPath -PathType Leaf)) {
+            Write-Error "Module manifest not found: $manifestPath"
+            exit 1
+          }
+
           if (-not $env:PSGALLERY_API_KEY) {
             Write-Error "PSGALLERY_API_KEY secret is not set"
             exit 1
           }
 
           Write-Host "Publishing Spotishell to PowerShell Gallery..."
-          Publish-Module -Path ./Spotishell -NuGetApiKey $env:PSGALLERY_API_KEY -Verbose -ErrorAction Stop
+          Publish-Module -Path $modulePath -NuGetApiKey $env:PSGALLERY_API_KEY -Verbose -ErrorAction Stop
           Write-Host "Successfully published to PowerShell Gallery!"
