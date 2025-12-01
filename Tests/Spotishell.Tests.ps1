@@ -269,4 +269,174 @@ Describe 'Parameter Validation' {
             { Get-Album } | Should -Throw
         }
     }
+
+    Context 'Add-PlaylistItem' {
+        It 'Should have ItemType parameter with valid values' {
+            $cmd = Get-Command Add-PlaylistItem
+            $validateSet = $cmd.Parameters['ItemType'].Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateSetAttribute] }
+            $validateSet | Should -Not -BeNullOrEmpty
+            $validateSet.ValidValues | Should -Contain 'track'
+            $validateSet.ValidValues | Should -Contain 'episode'
+        }
+
+        It 'Should have ItemType default to track' {
+            $cmd = Get-Command Add-PlaylistItem
+            $cmd.Parameters['ItemType'].Attributes | Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] }
+            # Check that the default value is 'track' by examining the function definition
+            $functionDef = (Get-Command Add-PlaylistItem).ScriptBlock.ToString()
+            $functionDef | Should -Match '\$ItemType\s*=\s*[''"]track[''"]'
+        }
+
+        It 'Should require Id parameter' {
+            { Add-PlaylistItem -ItemId 'test-id' } | Should -Throw
+        }
+
+        It 'Should require ItemId parameter' {
+            { Add-PlaylistItem -Id 'test-playlist' } | Should -Throw
+        }
+    }
+
+    Context 'Get-RecentlyPlayedTracks' {
+        It 'Should have IncludePlayContext switch parameter' {
+            $cmd = Get-Command Get-RecentlyPlayedTracks
+            $cmd.Parameters['IncludePlayContext'] | Should -Not -BeNullOrEmpty
+            $cmd.Parameters['IncludePlayContext'].SwitchParameter | Should -Be $true
+        }
+
+        It 'Should have Limit parameter with range validation' {
+            $cmd = Get-Command Get-RecentlyPlayedTracks
+            $validateRange = $cmd.Parameters['Limit'].Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateRangeAttribute] }
+            $validateRange | Should -Not -BeNullOrEmpty
+            $validateRange.MinRange | Should -Be 1
+            $validateRange.MaxRange | Should -Be 50
+        }
+    }
+}
+
+Describe 'Add-PlaylistItem Behavior' {
+    BeforeAll {
+        Mock Send-SpotifyCall { return @{ snapshot_id = 'mock-snapshot' } } -ModuleName Spotishell
+    }
+
+    Context 'URI Conversion' {
+        It 'Should convert a single plain ID to spotify:track URI' {
+            Add-PlaylistItem -Id 'playlist123' -ItemId 'track456'
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Body -match '"uris":\["spotify:track:track456"\]'
+            }
+        }
+
+        It 'Should convert multiple plain IDs to spotify:track URIs' {
+            Add-PlaylistItem -Id 'playlist123' -ItemId 'track1', 'track2', 'track3'
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Body -match 'spotify:track:track1' -and
+                $Body -match 'spotify:track:track2' -and
+                $Body -match 'spotify:track:track3'
+            }
+        }
+
+        It 'Should pass through existing spotify:track URIs unchanged' {
+            Add-PlaylistItem -Id 'playlist123' -ItemId 'spotify:track:existing123'
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Body -match '"uris":\["spotify:track:existing123"\]'
+            }
+        }
+
+        It 'Should pass through existing spotify:episode URIs unchanged' {
+            Add-PlaylistItem -Id 'playlist123' -ItemId 'spotify:episode:episode123'
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Body -match '"uris":\["spotify:episode:episode123"\]'
+            }
+        }
+
+        It 'Should use episode prefix when ItemType is episode' {
+            Add-PlaylistItem -Id 'playlist123' -ItemId 'episode456' -ItemType 'episode'
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Body -match '"uris":\["spotify:episode:episode456"\]'
+            }
+        }
+
+        It 'Should handle mixed URIs and plain IDs' {
+            Add-PlaylistItem -Id 'playlist123' -ItemId 'plain123', 'spotify:track:existing456'
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Body -match 'spotify:track:plain123' -and
+                $Body -match 'spotify:track:existing456'
+            }
+        }
+
+        It 'Should not split single item into characters (array handling)' {
+            Add-PlaylistItem -Id 'playlist123' -ItemId 'singletrack'
+
+            # This would fail if the bug existed - body would contain individual characters
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Body -notmatch '"s","i","n","g","l","e"' -and
+                $Body -match 'spotify:track:singletrack'
+            }
+        }
+    }
+
+    Context 'API Call' {
+        It 'Should call correct playlist endpoint' {
+            Add-PlaylistItem -Id 'myplaylist789' -ItemId 'track123'
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Uri -eq 'https://api.spotify.com/v1/playlists/myplaylist789/tracks' -and
+                $Method -eq 'Post'
+            }
+        }
+    }
+}
+
+Describe 'Get-RecentlyPlayedTracks Behavior' {
+    Context 'Response Handling' {
+        BeforeAll {
+            # Mock response matching Spotify API structure
+            $mockResponse = @{
+                items = @(
+                    @{
+                        played_at = '2025-12-01T17:21:53.000Z'
+                        context   = @{ type = 'playlist'; uri = 'spotify:playlist:abc' }
+                        track     = @{ id = 'track1'; name = 'Song 1'; artists = @(@{ name = 'Artist 1' }) }
+                    },
+                    @{
+                        played_at = '2025-12-01T16:00:00.000Z'
+                        context   = @{ type = 'album'; uri = 'spotify:album:xyz' }
+                        track     = @{ id = 'track2'; name = 'Song 2'; artists = @(@{ name = 'Artist 2' }) }
+                    }
+                )
+            }
+            Mock Send-SpotifyCall { return $mockResponse } -ModuleName Spotishell
+        }
+
+        It 'Should return only track objects by default' {
+            $result = Get-RecentlyPlayedTracks
+
+            $result.Count | Should -Be 2
+            $result[0].name | Should -Be 'Song 1'
+            $result[0].PSObject.Properties.Name | Should -Not -Contain 'played_at'
+        }
+
+        It 'Should return full items with played_at when IncludePlayContext is set' {
+            $result = Get-RecentlyPlayedTracks -IncludePlayContext
+
+            $result.Count | Should -Be 2
+            $result[0].played_at | Should -Be '2025-12-01T17:21:53.000Z'
+            $result[0].track.name | Should -Be 'Song 1'
+            $result[0].context.type | Should -Be 'playlist'
+        }
+
+        It 'Should call API with correct limit parameter' {
+            Get-RecentlyPlayedTracks -Limit 10
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Uri -match 'limit=10'
+            }
+        }
+    }
 }

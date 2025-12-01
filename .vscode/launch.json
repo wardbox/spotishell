@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "PowerShell: Launch Current File",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${file}",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "PowerShell: Interactive Session",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "",
+            "cwd": "${workspaceFolder}",
+            "createTemporaryIntegratedConsole": true
+        },
+        {
+            "name": "PowerShell: Launch Test Script",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/Scripts/Test-ManualFixes.ps1",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
