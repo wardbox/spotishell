@@ -11,18 +11,17 @@
     2. Run: Invoke-Pester -Path ./Tests/Spotishell.Integration.Tests.ps1 -Output Detailed
 
 .NOTES
-    These tests are NOT run as part of CI/CD pipelines.
-    They require:
-    - Valid Spotify API credentials (SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET)
-    - A test playlist that can be modified
-    - Active Spotify account with play history
+    These tests run in CI on main branch only (after PR merge).
+    They require GitHub Secrets:
+    - SPOTIFY_CLIENT_ID
+    - SPOTIFY_CLIENT_SECRET
 #>
 
 BeforeAll {
     $ModulePath = Join-Path $PSScriptRoot '..' 'Spotishell' 'Spotishell.psd1'
     Import-Module $ModulePath -Force
 
-    # Load .env file if it exists
+    # Load .env file if it exists (for local development)
     $EnvFile = Join-Path $PSScriptRoot '..' '.env'
     if (Test-Path $EnvFile) {
         Get-Content $EnvFile | ForEach-Object {
@@ -42,7 +41,7 @@ BeforeAll {
         $script:SkipTests = $true
     }
 
-    # Setup application if credentials exist
+    # Setup application and test playlist if credentials exist
     if (-not $script:SkipTests) {
         try {
             $app = Get-SpotifyApplication -Name 'integration-test' -ErrorAction SilentlyContinue
@@ -50,6 +49,19 @@ BeforeAll {
         catch {
             New-SpotifyApplication -Name 'integration-test' -ClientId $env:SPOTIFY_CLIENT_ID -ClientSecret $env:SPOTIFY_CLIENT_SECRET
         }
+
+        # Get current user for playlist creation
+        $script:CurrentUser = Get-CurrentUserProfile -ApplicationName 'integration-test'
+
+        # Create a temporary test playlist
+        $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+        $script:TestPlaylist = New-Playlist -UserId $script:CurrentUser.id `
+            -Name "Spotishell-Test-$timestamp" `
+            -Description 'Temporary playlist for integration testing. Safe to delete.' `
+            -Public $false `
+            -ApplicationName 'integration-test'
+
+        Write-Host "Created test playlist: $($script:TestPlaylist.name) ($($script:TestPlaylist.id))"
     }
 }
 
@@ -97,35 +109,25 @@ Describe 'Integration: Get-RecentlyPlayedTracks' -Skip:$script:SkipTests {
 }
 
 Describe 'Integration: Add-PlaylistItem' -Skip:$script:SkipTests {
-    BeforeAll {
-        # Get user's playlists to find a test playlist
-        $script:TestPlaylistId = $env:SPOTIFY_TEST_PLAYLIST_ID
-
-        if (-not $script:TestPlaylistId) {
-            Write-Warning "Set SPOTIFY_TEST_PLAYLIST_ID environment variable to run Add-PlaylistItem tests"
-            Write-Warning "Skipping Add-PlaylistItem integration tests"
-        }
-    }
-
-    Context 'Adding tracks with plain IDs' -Skip:(-not $script:TestPlaylistId) {
+    Context 'Adding tracks with plain IDs' {
         It 'Should add a track using plain ID (not full URI)' {
             # Use a well-known track ID (Rick Astley - Never Gonna Give You Up)
             $trackId = '4PTG3Z6ehGkBFwjybzWkR8'
 
             # This should not throw - the fix converts plain ID to URI
-            { Add-PlaylistItem -Id $script:TestPlaylistId -ItemId $trackId -ApplicationName 'integration-test' } | Should -Not -Throw
+            { Add-PlaylistItem -Id $script:TestPlaylist.id -ItemId $trackId -ApplicationName 'integration-test' } | Should -Not -Throw
         }
 
         It 'Should add a track using full URI' {
             $trackUri = 'spotify:track:4PTG3Z6ehGkBFwjybzWkR8'
 
-            { Add-PlaylistItem -Id $script:TestPlaylistId -ItemId $trackUri -ApplicationName 'integration-test' } | Should -Not -Throw
+            { Add-PlaylistItem -Id $script:TestPlaylist.id -ItemId $trackUri -ApplicationName 'integration-test' } | Should -Not -Throw
         }
 
         It 'Should add multiple tracks at once' {
             $trackIds = @('4PTG3Z6ehGkBFwjybzWkR8', '7GhIk7Il098yCjg4BQjzvb')
 
-            { Add-PlaylistItem -Id $script:TestPlaylistId -ItemId $trackIds -ApplicationName 'integration-test' } | Should -Not -Throw
+            { Add-PlaylistItem -Id $script:TestPlaylist.id -ItemId $trackIds -ApplicationName 'integration-test' } | Should -Not -Throw
         }
     }
 }
@@ -148,7 +150,17 @@ Describe 'Integration: Search' -Skip:$script:SkipTests {
 }
 
 AfterAll {
-    # Cleanup: Remove test application
+    # Cleanup: Remove test playlist and application
+    if ($script:TestPlaylist) {
+        try {
+            Write-Host "Cleaning up test playlist: $($script:TestPlaylist.id)"
+            Remove-FollowedPlaylist -Id $script:TestPlaylist.id -ApplicationName 'integration-test' -ErrorAction SilentlyContinue
+        }
+        catch {
+            Write-Warning "Could not remove test playlist: $_"
+        }
+    }
+
     try {
         Remove-SpotifyApplication -Name 'integration-test' -ErrorAction SilentlyContinue
     }
