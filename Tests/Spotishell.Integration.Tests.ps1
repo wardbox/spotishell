@@ -43,10 +43,16 @@ BeforeAll {
 
     # Setup application and test playlist if credentials exist
     if (-not $script:SkipTests) {
+        # Check if application exists, create if not
+        $app = $null
         try {
             $app = Get-SpotifyApplication -Name 'integration-test' -ErrorAction SilentlyContinue
         }
         catch {
+            # Application doesn't exist, will create below
+        }
+
+        if (-not $app) {
             New-SpotifyApplication -Name 'integration-test' -ClientId $env:SPOTIFY_CLIENT_ID -ClientSecret $env:SPOTIFY_CLIENT_SECRET
         }
 
