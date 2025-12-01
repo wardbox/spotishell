@@ -164,6 +164,13 @@ Describe 'Integration: Add-PlaylistItem' -Skip:$script:SkipTests {
 
             { Add-PlaylistItem -Id $script:TestPlaylist.id -ItemId $trackIds -ApplicationName 'integration-test' } | Should -Not -Throw
         }
+
+        It 'Should add an episode using ItemType parameter' {
+            # The Joe Rogan Experience episode (well-known podcast)
+            $episodeId = '512ojhOuo1ktJprKbVcKyQ'
+
+            { Add-PlaylistItem -Id $script:TestPlaylist.id -ItemId $episodeId -ItemType 'episode' -ApplicationName 'integration-test' } | Should -Not -Throw
+        }
     }
 }
 

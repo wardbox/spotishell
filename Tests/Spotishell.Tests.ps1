@@ -390,6 +390,22 @@ Describe 'Add-PlaylistItem Behavior' {
                 $Method -eq 'Post'
             }
         }
+
+        It 'Should include position in API call when specified' {
+            Add-PlaylistItem -Id 'playlist123' -ItemId 'track456' -Position 5
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Body -match '"position":5'
+            }
+        }
+
+        It 'Should include position 0 in API call' {
+            Add-PlaylistItem -Id 'playlist123' -ItemId 'track456' -Position 0
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Body -match '"position":0'
+            }
+        }
     }
 }
 
