@@ -86,8 +86,10 @@ jobs:
   integration-test:
     name: Integration Tests
     runs-on: ubuntu-latest
-    # Only run on main branch, not PRs (protects secrets from forks)
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Run on main pushes and PRs from same repo (not forks - protects secrets)
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     needs: [test, module-validation]
 
     steps:
