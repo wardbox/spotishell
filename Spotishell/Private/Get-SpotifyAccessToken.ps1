@@ -3,7 +3,7 @@
         Gets a Spotify access token
     .DESCRIPTION
         Gets a Spotify access token using defined SpotifyApplication
-        It follows the Authorization Code Flow (https://developer.spotify.com/documentation/general/guides/authorization-guide/#authorization-code-flow)
+        It follows the Authorization Code Flow with PKCE (https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow)
     .EXAMPLE
         PS C:\> Get-SpotifyAccessToken -ApplicationName 'dev'
         Looks for a saved credential named "dev" and tries to get an access token with it's credentials
@@ -12,6 +12,45 @@
     .PARAMETER ApplicationName
         Specifies the Spotify Application Name (otherwise default is used)
 #>
+
+function New-PkceChallenge {
+    <#
+    .SYNOPSIS
+        Generates PKCE code_verifier and code_challenge for OAuth 2.0
+    #>
+    [CmdletBinding()]
+    param()
+
+    # Generate code_verifier: 64 random bytes -> base64url encoded (results in 86 chars)
+    $RandomBytes = [byte[]]::new(64)
+    $Rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    try {
+        $Rng.GetBytes($RandomBytes)
+    }
+    finally {
+        $Rng.Dispose()
+    }
+
+    # Base64url encode (no padding, - instead of +, _ instead of /)
+    $CodeVerifier = [Convert]::ToBase64String($RandomBytes) -replace '\+', '-' -replace '/', '_' -replace '=', ''
+
+    # Generate code_challenge: SHA256 hash of verifier, then base64url encode
+    $Sha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $ChallengeBytes = $Sha256.ComputeHash([System.Text.Encoding]::ASCII.GetBytes($CodeVerifier))
+    }
+    finally {
+        $Sha256.Dispose()
+    }
+
+    $CodeChallenge = [Convert]::ToBase64String($ChallengeBytes) -replace '\+', '-' -replace '/', '_' -replace '=', ''
+
+    return @{
+        Verifier  = $CodeVerifier
+        Challenge = $CodeChallenge
+    }
+}
+
 function Get-SpotifyAccessToken {
 
     [CmdletBinding()]
@@ -42,11 +81,15 @@ function Get-SpotifyAccessToken {
             # STEP 1 : Prepare
             $Uri = 'https://accounts.spotify.com/api/token'
             $Method = 'Post'
+            # Per PKCE spec, client_secret is not required for refresh tokens.
+            # Only include it if present for backward compatibility with confidential clients.
             $Body = @{
                 grant_type    = 'refresh_token'
                 refresh_token = $Application.Token.refresh_token
-                client_id     = $Application.ClientId # alternative way to send the client id and secret
-                client_secret = $Application.ClientSecret # alternative way to send the client id and secret
+                client_id     = $Application.ClientId
+            }
+            if ($Application.ClientSecret) {
+                $Body.client_secret = $Application.ClientSecret
             }
 
             # STEP 2 : Make request to the Spotify Accounts service
@@ -83,7 +126,7 @@ function Get-SpotifyAccessToken {
     }
 
     # Starting this point, neither valid access token were found nor successful refresh were done
-    # So we start Authorization Code Flow from zero
+    # So we start Authorization Code Flow with PKCE from zero
 
     # ------------------------------ Authorization Code retrieval ------------------------------
     # STEP 1 : Prepare
@@ -111,16 +154,25 @@ function Get-SpotifyAccessToken {
     ) -join '%20'
     $State = (New-Guid).ToString()
 
+    # Generate PKCE challenge
+    $Pkce = New-PkceChallenge
+
+    # Save code_verifier to Application for use in token exchange
+    Set-SpotifyApplication -Name $ApplicationName -CodeVerifier $Pkce.Verifier
+    $Application = Get-SpotifyApplication -Name $ApplicationName
+
     $Uri = 'https://accounts.spotify.com/authorize'
     $Uri += "?client_id=$($Application.ClientId)"
     $Uri += '&response_type=code'
     $Uri += "&redirect_uri=$EncodedRedirectUri"
     $Uri += "&state=$State"
     $Uri += "&scope=$EncodedScopes"
+    $Uri += "&code_challenge_method=S256"
+    $Uri += "&code_challenge=$($Pkce.Challenge)"
     
 
     # if running in a Docker container
-    if ($env:POWERSHELL_DISTRIBUTION_CHANNEL.StartsWith('PSDocker')){
+    if ($env:POWERSHELL_DISTRIBUTION_CHANNEL -and $env:POWERSHELL_DISTRIBUTION_CHANNEL.StartsWith('PSDocker')) {
         # then Enable NoGUI
         $NoGUI = $true
         Write-Verbose 'Running into a Docker Container : switch to manual authorization'
@@ -235,14 +287,18 @@ function Get-SpotifyAccessToken {
 
     # ------------------------------ Token retrieval ------------------------------
     # STEP 1 : Prepare
+    if (-not $Application.CodeVerifier) {
+        Throw 'CodeVerifier is missing; please rerun Get-SpotifyAccessToken to initiate a fresh PKCE authorization.'
+    }
+
     $Uri = 'https://accounts.spotify.com/api/token'
     $Method = 'Post'
     $Body = @{
         grant_type    = 'authorization_code'
         code          = $AuthorizationCode
         redirect_uri  = $Application.RedirectUri
-        client_id     = $Application.ClientId # alternative way to send the client id and secret
-        client_secret = $Application.ClientSecret # alternative way to send the client id and secret
+        client_id     = $Application.ClientId
+        code_verifier = $Application.CodeVerifier  # PKCE: use stored code_verifier
     }
 
     # STEP 2 : Make request to the Spotify Accounts service
@@ -268,6 +324,9 @@ function Get-SpotifyAccessToken {
 
     Set-SpotifyApplication -Name $ApplicationName -Token $Token
     Write-Verbose 'Successfully saved Token'
+
+    # Clear the code verifier as it's no longer needed after successful token exchange
+    Set-SpotifyApplication -Name $ApplicationName -CodeVerifier ''
 
     return $Token.access_token
 }

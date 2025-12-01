@@ -19,6 +19,8 @@
         Specifies the new redirect Uri of the Spotify Application
     .PARAMETER Token
         Specifies the new Token retrieved from the Spotify Application
+    .PARAMETER CodeVerifier
+        Specifies the PKCE code verifier for OAuth flow. Pass empty string to clear.
 #>
 function Set-SpotifyApplication {
 
@@ -39,7 +41,12 @@ function Set-SpotifyApplication {
         $RedirectUri,
 
         [Parameter(Mandatory, ParameterSetName = "Token")]
-        $Token
+        $Token,
+
+        [Parameter(Mandatory, ParameterSetName = "CodeVerifier")]
+        [AllowEmptyString()]
+        [String]
+        $CodeVerifier
     )
 
     $StorePath = Get-StorePath
@@ -54,6 +61,14 @@ function Set-SpotifyApplication {
     if ($ClientSecret) { $Application.ClientSecret = $ClientSecret }
     if ($RedirectUri) { $Application.RedirectUri = $RedirectUri }
     if ($Token) { $Application.Token = $Token }
+    if ($PSBoundParameters.ContainsKey('CodeVerifier')) {
+        if ($CodeVerifier) {
+            $Application.CodeVerifier = $CodeVerifier
+        }
+        elseif ($Application.PSObject.Properties['CodeVerifier']) {
+            $Application.PSObject.Properties.Remove('CodeVerifier')
+        }
+    }
     
     # Try to save application to file.
     try {
