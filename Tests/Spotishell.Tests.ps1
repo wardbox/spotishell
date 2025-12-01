@@ -194,8 +194,6 @@ Describe 'Application Management' {
 
         It 'Should create application file in store' {
             New-SpotifyApplication -Name 'test-file-app' -ClientId 'file-id' -ClientSecret 'file-secret'
-            # Get-StorePath adds the trailing slash and spotishell subfolder
-            . (Join-Path $PrivatePath 'Get-StorePath.ps1')
             $storePath = Get-StorePath
             $filePath = Join-Path $storePath 'test-file-app.json'
             Test-Path $filePath | Should -Be $true
@@ -242,16 +240,12 @@ Describe 'Parameter Validation' {
         }
 
         It 'Should accept valid Type values' {
-            # This will fail auth but validates parameter acceptance
-            $validTypes = @('Album', 'Artist', 'Playlist', 'Track', 'Show', 'Episode')
-            foreach ($type in $validTypes) {
-                {
-                    $params = @{ Query = 'test'; Type = $type; ErrorAction = 'Stop' }
-                    # Just validate the parameter binding, not the actual call
-                    $cmd = Get-Command Search-Item
-                    $null = $cmd.Parameters['Type'].Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateSetAttribute] }
-                } | Should -Not -Throw
-            }
+            $cmd = Get-Command Search-Item
+            $validateSet = $cmd.Parameters['Type'].Attributes | Where-Object { $_ -is [System.Management.Automation.ValidateSetAttribute] }
+            $validateSet | Should -Not -BeNullOrEmpty
+            $validateSet.ValidValues | Should -Contain 'Album'
+            $validateSet.ValidValues | Should -Contain 'Artist'
+            $validateSet.ValidValues | Should -Contain 'Playlist'
         }
     }
 

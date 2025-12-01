@@ -58,5 +58,5 @@ jobs:
           }
 
           Write-Host "Publishing Spotishell to PowerShell Gallery..."
-          Publish-Module -Path ./Spotishell -NuGetApiKey $env:PSGALLERY_API_KEY -Verbose
+          Publish-Module -Path ./Spotishell -NuGetApiKey $env:PSGALLERY_API_KEY -Verbose -ErrorAction Stop
           Write-Host "Successfully published to PowerShell Gallery!"
