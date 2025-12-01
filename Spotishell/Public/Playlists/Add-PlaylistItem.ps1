@@ -67,7 +67,7 @@ function Add-PlaylistItem {
     for ($i = 0; $i -lt $ProcessedItems.Count; $i += 100) {
 
         $BodyHashtable = @{uris = $ProcessedItems[$i..($i + 99)] }
-        if ($Position) { $BodyHashtable.position = ($Position + $i + 1) }
+        if ($PSBoundParameters.ContainsKey('Position')) { $BodyHashtable.position = ($Position + $i) }
 
         $Body = ConvertTo-Json $BodyHashtable -Compress
 
