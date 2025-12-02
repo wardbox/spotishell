@@ -42,7 +42,8 @@ jobs:
           Import-Module Pester
 
           $config = New-PesterConfiguration
-          $config.Run.Path = './Tests'
+          # Only run unit tests, exclude integration tests (require API credentials)
+          $config.Run.Path = './Tests/Spotishell.Tests.ps1'
           $config.Run.Exit = $true
           $config.TestResult.Enabled = $true
           $config.TestResult.OutputPath = 'testResults.xml'

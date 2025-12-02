@@ -1,5 +1,8 @@
 
-\.vscode/
+# VS Code - ignore user-specific settings but allow launch.json
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
 
 \.DS_Store
 dev/publish-psgallery\.ps1
@@ -11,3 +14,8 @@ Whiteboard\.ps1
 publish-psgallery\.ps1
 
 dev/
+
+# Local environment files (credentials)
+.env
+.env.local
+Scripts/*.local.ps1

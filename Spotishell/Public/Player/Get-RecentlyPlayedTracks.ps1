@@ -2,17 +2,26 @@
     .SYNOPSIS
         Get tracks from the current user's recently played tracks.
     .EXAMPLE
-        PS C:\> Get-RecentlyPlayed
+        PS C:\> Get-RecentlyPlayedTracks
         Retrieves the recently played tracks
+    .EXAMPLE
+        PS C:\> Get-RecentlyPlayedTracks -IncludePlayContext
+        Retrieves recently played items with played_at timestamp and context information
+    .EXAMPLE
+        PS C:\> Get-RecentlyPlayedTracks -IncludePlayContext | Select-Object played_at, @{N='TrackName';E={$_.track.name}}
+        Get recently played tracks with their play timestamps
     .PARAMETER ApplicationName
         Specifies the Spotify Application Name (otherwise default is used)
     .PARAMETER Limit
-        Specifies how many entries to fetch. 
+        Specifies how many entries to fetch.
         Allowed range is 1 through 50.
     .PARAMETER BeforeTimestamp
         Returns all items before (but not including) this cursor position. If before is specified, after must not be specified.
     .PARAMETER AfterTimestamp
         Returns all items after (but not including) this cursor position. If after is specified, before must not be specified.
+    .PARAMETER IncludePlayContext
+        When specified, returns full play history items including played_at timestamp and context.
+        Without this switch, only the track objects are returned (default behavior for backwards compatibility).
     .NOTES
         Returns the most recent 50 tracks played by a user.
         Note that a track currently playing will not be visible in play history until it has completed.
@@ -40,7 +49,13 @@ function Get-RecentlyPlayedTracks {
 
         [nullable[datetime]]
         [Parameter(ParameterSetName = 'AfterTimestamp')]
-        $AfterTimestamp = $null
+        $AfterTimestamp = $null,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'BeforeTimestamp')]
+        [Parameter(ParameterSetName = 'AfterTimestamp')]
+        [switch]
+        $IncludePlayContext
     )
 
     $Method = 'Get'
@@ -55,5 +70,11 @@ function Get-RecentlyPlayedTracks {
     }
 
     $Response = Send-SpotifyCall -Method $Method -Uri $Uri -ApplicationName $ApplicationName
-    $Response.items.track
+
+    if ($IncludePlayContext) {
+        $Response.items  # Returns full objects: played_at, context, track
+    }
+    else {
+        $Response.items.track  # Backwards compatible - track objects only
+    }
 }
