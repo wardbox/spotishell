@@ -407,6 +407,41 @@ Describe 'Add-PlaylistItem Behavior' {
             }
         }
     }
+
+    Context 'Batching Behavior' {
+        BeforeEach {
+            # Reset mock call history before each test
+            Mock Send-SpotifyCall { return @{ snapshot_id = 'mock-snapshot' } } -ModuleName Spotishell
+        }
+
+        It 'Should batch 150 items into two API calls (100 + 50)' {
+            $trackIds = 1..150 | ForEach-Object { "track$_" }
+
+            Add-PlaylistItem -Id 'playlist123' -ItemId $trackIds
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -Times 2 -Exactly
+        }
+
+        It 'Should use position 10 in first batch when Position is 10' {
+            $trackIds = 1..150 | ForEach-Object { "track$_" }
+
+            Add-PlaylistItem -Id 'playlist123' -ItemId $trackIds -Position 10
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Body -match '"position":10'
+            }
+        }
+
+        It 'Should use position 110 in second batch when Position is 10' {
+            $trackIds = 1..150 | ForEach-Object { "track$_" }
+
+            Add-PlaylistItem -Id 'playlist123' -ItemId $trackIds -Position 10
+
+            Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
+                $Body -match '"position":110'
+            }
+        }
+    }
 }
 
 Describe 'Get-RecentlyPlayedTracks Behavior' {
