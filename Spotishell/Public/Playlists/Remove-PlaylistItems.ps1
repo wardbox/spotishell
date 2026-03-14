@@ -39,11 +39,11 @@ function Remove-PlaylistItems {
     )
 
     $Method = 'Delete'
-    $Uri = "https://api.spotify.com/v1/playlists/$Id/tracks"
+    $Uri = "https://api.spotify.com/v1/playlists/$Id/items"
 
     for ($i = 0; $i -lt $Track.Count; $i += 100) {
 
-        $BodyHashtable = @{tracks = $Track[$i..($i + 99)] }
+        $BodyHashtable = @{items = $Track[$i..($i + 99)] }
         if ($SnapshotId) { $BodyHashtable.snapshot_id = $SnapshotId }
         $Body = ConvertTo-Json $BodyHashtable -Compress
 

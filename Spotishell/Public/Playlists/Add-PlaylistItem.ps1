@@ -51,7 +51,7 @@ function Add-PlaylistItem {
     )
 
     $Method = 'Post'
-    $Uri = "https://api.spotify.com/v1/playlists/$Id/tracks"
+    $Uri = "https://api.spotify.com/v1/playlists/$Id/items"
 
     # Convert plain IDs to URIs, pass through existing URIs unchanged
     # Use @() to ensure result is always an array (single items would otherwise be strings)

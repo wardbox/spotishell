@@ -386,7 +386,7 @@ Describe 'Add-PlaylistItem Behavior' {
             Add-PlaylistItem -Id 'myplaylist789' -ItemId 'track123'
 
             Should -Invoke Send-SpotifyCall -ModuleName Spotishell -ParameterFilter {
-                $Uri -eq 'https://api.spotify.com/v1/playlists/myplaylist789/tracks' -and
+                $Uri -eq 'https://api.spotify.com/v1/playlists/myplaylist789/items' -and
                 $Method -eq 'Post'
             }
         }

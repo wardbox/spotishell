@@ -29,7 +29,7 @@ function Set-PlaylistItems {
     )
 
     $Method = 'Put'
-    $Uri = "https://api.spotify.com/v1/playlists/$Id/tracks"
+    $Uri = "https://api.spotify.com/v1/playlists/$Id/items"
 
     if ($Uris) {
 
