@@ -37,7 +37,7 @@ function Get-PlaylistItems {
     )
 
     $Method = 'Get'
-    $Uri = "https://api.spotify.com/v1/playlists/$Id/tracks?limit=100"
+    $Uri = "https://api.spotify.com/v1/playlists/$Id/items?limit=100"
 
     $Query = @()
     if ($Field) { $Query += 'fields=' + $Field }
