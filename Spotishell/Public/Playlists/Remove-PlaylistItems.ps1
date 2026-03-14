@@ -9,7 +9,7 @@
         Removes specific occurrence of both items by specifying both the uris and item positions in the playlist with Id 'myPlaylistId'
     .EXAMPLE
         PS C:\> Remove-PlaylistItems -Id 'myPlaylistId' -Item @(@{uri = 'spotify:track:4iV5W9uYEdYUVa79Axb7Rh' }) -SnapshotId 'mySuperPlaylistSnapshot'
-        Removes all occurrences of both items in the specific snapshot with Id 'mySuperPlaylistSnapshot' of the playlist
+        Removes all occurrences of the item in the specific snapshot with Id 'mySuperPlaylistSnapshot' of the playlist
     .PARAMETER Id
         Specifies the Spotify ID for the playlist.
     .PARAMETER Item
@@ -43,8 +43,8 @@ function Remove-PlaylistItems {
     $Uri = "https://api.spotify.com/v1/playlists/$Id/items"
 
     for ($i = 0; $i -lt $Item.Count; $i += 100) {
-
-        $BodyHashtable = @{items = $Item[$i..($i + 99)] }
+        $end = [Math]::Min($i + 99, $Item.Count - 1)
+        $BodyHashtable = @{items = $Item[$i..$end] }
         if ($SnapshotId) { $BodyHashtable.snapshot_id = $SnapshotId }
         $Body = ConvertTo-Json $BodyHashtable -Compress
 
